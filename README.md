@@ -1,2 +1,2 @@
-# cosmology_reconstruction-_frb
-Generating of mock data and reconstruction of cosmological models using FRB data.
+# cosmology_reconstruction_frb
+Generating mock data and reconstruction of cosmological models using FRB data.
