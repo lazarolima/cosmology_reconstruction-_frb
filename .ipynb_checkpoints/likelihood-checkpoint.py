@@ -34,8 +34,6 @@ class Priors:
         params[0] = cube[0]
         params[1] = 10 * cube[1] - 5
         return params
-    
-model = H_Model()    
 
 class LikelihoodFunction:
 
@@ -43,6 +41,7 @@ class LikelihoodFunction:
     def log_likelihood1(params):
         f_IGM = params
         # Defining a fiducial model for H(z)
+        model = H_Model()
         y_model = model.H_p1(z_values, f_IGM=f_IGM)
         loglike = -0.5 * np.sum(((y_model - H_obs) / errors)**2)
         return loglike
@@ -51,6 +50,7 @@ class LikelihoodFunction:
     def log_likelihood2(params):
         f_IGM, alpha = params
         # Defining a fiducial model for H(z)
+        model = H_Model()
         y_model = model.H_p2(z_values, f_IGM=f_IGM, alpha=alpha)
         loglike = -0.5 * np.sum(((y_model - H_obs) / errors)**2)
         return loglike
@@ -59,6 +59,7 @@ class LikelihoodFunction:
     def log_likelihood3(params):
         f_IGM, alpha = params
         # Defining a fiducial model for H(z)
+        model = H_Model()
         y_model = model.H_p3(z_values, f_IGM=f_IGM, alpha=alpha)
         loglike = -0.5 * np.sum(((y_model - H_obs) / errors)**2)
         return loglike
@@ -67,6 +68,7 @@ class LikelihoodFunction:
     def log_likelihood4(params):
         f_IGM, s = params
         # Defining a fiducial model for H(z)
+        model = H_Model()
         y_model = model.H_p4(z_values, f_IGM=f_IGM, s=s)
         loglike = -0.5 * np.sum(((y_model - H_obs) / errors)**2)
         return loglike

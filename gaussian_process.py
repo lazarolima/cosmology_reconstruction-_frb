@@ -1,11 +1,11 @@
-import obs_data as od
 import numpy as np
 import GPy
+from obs_data import H_data
 
 # Reconstrução de H(z)
-z_values = od.z_func()
-H_obs = od.H_func()
-errors = od.errors_func()
+z_values = H_data.z_func()
+H_obs = H_data.H_func()
+errors = H_data.errors_func()
 
 # Preparar os dados para o GP
 X = z_values.reshape(-1, 1)
@@ -59,6 +59,8 @@ kernel1 = GPy.kern.RBF(input_dim=1, variance=100., lengthscale=0.1)
 m1 = GPy.models.GPRegression(X1, Y1, kernel1)
 
 # Definir a variância do ruído
+import obs_data as od
+
 m1.Gaussian_noise.variance = np.mean(od.DM_IGM_obs_error**2)
 
 # Otimizar o modelo

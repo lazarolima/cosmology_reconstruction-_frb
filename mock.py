@@ -1,5 +1,8 @@
 import numpy as np
-import equations as eq
+from equations import FiducialModel
+
+# Defining a fiducial model
+model = FiducialModel()
 
 class RedshiftSimulation:
     def __init__(self, n, z_max):
@@ -17,7 +20,8 @@ class RedshiftSimulation:
         if self.new_z is None:
             self.generate_redshifts()
         sigma_IGM = 173.8 * self.new_z ** 0.4
-        self.DM_IGM_sim = np.random.normal(loc=eq.DM_IGM(self.new_z), scale=sigma_IGM, size=self.n)
+        DM_IGM = model.DM_IGM(self.new_z)
+        self.DM_IGM_sim = np.random.normal(loc=DM_IGM, scale=sigma_IGM, size=self.n)
         return self.DM_IGM_sim
 
     def get_new_z(self):
