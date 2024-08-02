@@ -1,12 +1,28 @@
-from obs_data import H_data
-from equations import H_Model
 import numpy as np
 
-z_values = H_data.z_func()
-H_obs = H_data.H_func()
-errors = H_data.errors_func()
+class LikelihoodFunction:
+    
+    def __init__(self, model_func):
+        self.model_func = model_func
+    
+    def log_likelihood(self, params, z_values, H_obs, errors):
+        y_model = self.model_func(z_values, *params)
+        loglike = -0.5 * np.sum(((y_model - H_obs) / errors)**2)
+        return loglike
 
-# Defining the Priors
+class Priors:
+    
+    def __init__(self, param_names, intervals):
+        self.param_names = param_names
+        self.intervals = intervals
+
+    def prior_transform(self, cube):
+        params = cube.copy()
+        for i, (low, high) in enumerate(self.intervals):
+            params[i] = low + (high - low) * cube[i]
+        return params
+
+"""# Defining the Priors
 class Priors:
 
     parameters1 = ['$f_{IGM}$']
@@ -69,4 +85,4 @@ class LikelihoodFunction:
         # Defining a fiducial model for H(z)
         y_model = model.H_p4(z_values, f_IGM=f_IGM, s=s)
         loglike = -0.5 * np.sum(((y_model - H_obs) / errors)**2)
-        return loglike
+        return loglike"""

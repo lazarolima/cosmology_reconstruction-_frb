@@ -33,7 +33,7 @@ class FiducialModel:
             return np.array([quad(self.I, 0, zi)[0] for zi in z])
 
 
-# Include your parameterizations for baryon mass fraction f_IGM(z)
+# Include your parameterizations for baryons mass fraction f_IGM(z)
 class Parameterization_f_IGM:
 
     @staticmethod
@@ -55,6 +55,42 @@ fiducial_model = FiducialModel()
 Parameterization = Parameterization_f_IGM()
 
 class H_Model:           
+
+    def __init__(self):
+        self.factor = fiducial_model.factor
+
+        # Using the derivative of DM_IGM(z) via Gaussian Process
+        mean1, var1, mean_deriv1, var_deriv1 = gp.pred_new()
+        mean_deriv1 = mean_deriv1.flatten()
+        self.mean_deriv1 = mean_deriv1
+        self.z_interp = gp.z_pred().flatten()
+
+        # Interpolation to represent the derivative of dDM_IGM(z)
+        self.interp_mean_deriv1 = interp1d(self.z_interp, self.mean_deriv1, kind='linear', fill_value="extrapolate")
+
+    def H_p(self, z, f_IGM, param, model_type):
+        mean_deriv1_interp = self.interp_mean_deriv1(z)
+
+        # Select parameterization based on model_type
+        if model_type == 'constant':
+            fIGM = f_IGM
+        elif model_type == 'p2':
+            fIGM = Parameterization_f_IGM.f_IGM_p2(z, f_IGM, param)
+        elif model_type == 'p3':
+            fIGM = Parameterization_f_IGM.f_IGM_p3(z, f_IGM, param)
+        elif model_type == 'p4':
+            fIGM = Parameterization_f_IGM.f_IGM_Linder(z, f_IGM, param)
+        else:
+            raise ValueError("Model type must be 'constant', 'p2', 'p3', or 'p4'.")
+
+        result = self.factor * (1 + z) * fIGM * 0.875 / mean_deriv1_interp
+        return result
+
+    """def model_H_p(z, f_IGM, param, model_type):
+        result = H_p(z, f_IGM, param, model_type)
+        return result"""
+
+"""class H_Model:           
 
     def __init__(self):
         self.factor = fiducial_model.factor
@@ -89,4 +125,4 @@ class H_Model:
         mean_deriv1_interp = self.interp_mean_deriv1(z)
         fIGM4 = Parameterization.f_IGM_Linder(z, f_IGM, s)
         result = self.factor * (1 + z) * fIGM4 * 0.875 / mean_deriv1_interp
-        return result      
+        return result"""      
