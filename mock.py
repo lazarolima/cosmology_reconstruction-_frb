@@ -2,7 +2,7 @@ import numpy as np
 from equations import FiducialModel
 
 # Defining a fiducial model
-model = FiducialModel()
+fiducial_model = FiducialModel()
 
 class RedshiftSimulation:
     def __init__(self, n, z_max):
@@ -29,7 +29,7 @@ class RedshiftSimulation:
     def simulate_DM_IGM(self):
         if self.sigma_DM_IGM is None:
             self.sigma_DM_IGM_sim()
-        DM_IGM = model.DM_IGM(self.new_z)
+        DM_IGM = fiducial_model.DM_IGM(self.new_z)
         self.DM_IGM_sim = np.random.normal(loc=DM_IGM, scale=self.sigma_DM_IGM, size=self.n)
         return self.DM_IGM_sim
 
@@ -42,4 +42,6 @@ class RedshiftSimulation:
     def get_sigma_DM_IGM_sim(self):
         return self.sigma_DM_IGM
     
+
+
     
