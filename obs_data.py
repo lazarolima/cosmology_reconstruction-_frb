@@ -44,7 +44,7 @@ class FRB_data:
         return np.array([200.0, 123.2, 37.2, 27.0, 188.0, 44.7, 38.0, 33.0, 57.3, 40.5, 152.0, 36.0, 57.83, 
                          102.0, 56.4, 37.0])
 
-data =FRB_data()
+data = FRB_data()
 z_obs = data.z_frb()
 DM_obs = data.DM_frb()
 DM_obs_error = data.error_frb()

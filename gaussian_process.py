@@ -1,14 +1,13 @@
 import numpy as np
 import GPy
-from obs_data import H_data
 from mock import RedshiftSimulation
 import obs_data as od
 
 class GPReconstructionH:
-    def __init__(self, kernel_params=None):
-        self.z_values = H_data.z_func()
-        self.H_obs = H_data.H_func()
-        self.errors = H_data.errors_func()
+    def __init__(self, z_values, H_obs, errors, kernel_params=None):
+        self.z_values = z_values
+        self.H_obs = H_obs
+        self.errors = errors
         
         # Preparar os dados para o GP
         self.X = self.z_values.reshape(-1, 1)
@@ -83,6 +82,6 @@ class GPReconstructionDMIGM:
         return np.linspace(0, 2, num_points).reshape(-1, 1)
         
     def predict(self):
-        mean1, var1 = self.model1.predict(self.z_pred())
-        mean_deriv1, var_deriv1 = self.model1.predict_jacobian(self.z_pred())
-        return mean1, var1, mean_deriv1, var_deriv1
+        mean, var = self.model1.predict(self.z_pred())
+        mean_deriv, var_deriv = self.model1.predict_jacobian(self.z_pred())
+        return mean, var, mean_deriv, var_deriv

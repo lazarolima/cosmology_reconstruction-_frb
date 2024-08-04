@@ -11,7 +11,7 @@ class RedshiftSimulation:
         self.new_z = None
         self.DM_IGM_sim = None
         self.sigma_DM_IGM = None
-        self.sigma_obs = 0.5
+        self.sigma_obs: float = 0.5
         self.sigma_MW = 10
 
     def generate_redshifts(self):
