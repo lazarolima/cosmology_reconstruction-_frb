@@ -69,7 +69,7 @@ class H_Model:
         self.z_interp = gp.z_pred().flatten()
 
         # Carrega a função reconstruída da ANN
-        self.func = np.load('data/ANN_DM_IGM_nodes[1, 4096, 2].npy')
+        self.func = np.load('data/ANN_DM_IGM_bingo_nodes[1, 4096, 2].npy')
 
     def deriv_ann(self):
 
@@ -113,5 +113,6 @@ class H_Model:
             raise ValueError("Model type must be 'constant', 'p2', 'p3', or 'p4'.")
 
         mean_deriv_interp = self.interp_mean_deriv(z)
-        result = self.factor * (1 + z) * fIGM * 0.875 / mean_deriv_interp
+        xe = 0.875
+        result = self.factor * (1 + z) * fIGM * xe / mean_deriv_interp
         return result      
