@@ -49,27 +49,12 @@ class Parameterization_f_IGM:
     @staticmethod
     def f_IGM_Linder(z, f_IGM, s):
         return f_IGM * (1 + s * (z - 3))
+    
 
-# Create your class to include the parameterization for the Hubble parameter
-
-fiducial_model = FiducialModel()
-Parameterization = Parameterization_f_IGM()
-
-class H_Model:           
-
+class derivative_ann:
     def __init__(self):
-        self.factor = fiducial_model.factor
-
-        # Using the derivative of DM_IGM(z) via Gaussian Process
-        from gaussian_process import GPReconstructionDMIGM
-        gp = GPReconstructionDMIGM()
-        __, __, mean_deriv, __ = gp.predict()
-        mean_deriv = mean_deriv.flatten()
-        self.mean_deriv = mean_deriv
-        self.z_interp = gp.z_pred().flatten()
-
-        # Carrega a função reconstruída da ANN
-        self.func = np.load('data/ANN_DM_IGM_bingo_nodes[1, 4096, 2].npy')
+    # Carrega a função reconstruída da ANN
+        self.func = np.load('data/ANN_DM_IGM_bingo_nodes[1, 4096, 1].npy')
 
     def deriv_ann(self):
 
@@ -84,14 +69,33 @@ class H_Model:
         
         return np.column_stack((self.x, derivative))
 
+# Create your class to include the parameterization for the Hubble parameter
+
+fiducial_model = FiducialModel()
+Parameterization = Parameterization_f_IGM()
+derivative_dm_ann = derivative_ann()
+
+class H_Model:           
+
+    def __init__(self):
+        self.factor = fiducial_model.factor
+
+        # Using the derivative of DM_IGM(z) via Gaussian Process
+        from gaussian_process import GPReconstructionDMIGM
+        gp = GPReconstructionDMIGM()
+        __, __, mean_deriv, __ = gp.predict()
+        mean_deriv = mean_deriv.flatten()
+        self.mean_deriv = mean_deriv
+        self.z_interp = gp.z_pred().flatten()
+
     def H_p(self, z, f_IGM, param, model_type, deriv_type):
 
-        # Using the DM_IGM(z) via ANN (ReFANN)
-        deriv = self.deriv_ann()
+        # Using the dDM_IGM(z)/dz reconstructed via ANN (ReFANN)
+        deriv = derivative_dm_ann.deriv_ann()
         self.z_interp_ann = deriv[:,0] 
         self.mean_deriv_ann = deriv[:,1]
 
-        # Interpolation to represent the derivative of dDM_IGM(z)
+        # Interpolation to represent the derivative of DM_IGM(z)
         # Select interpolation based on deriv_type
         if deriv_type == 'GP':
             self.interp_mean_deriv = interp1d(self.z_interp, self.mean_deriv, kind='linear', fill_value="extrapolate")

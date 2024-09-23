@@ -9,7 +9,6 @@ class DMIGMReconstructionPlot:
         self.new_z = new_z
         self.DM_IGM_sim = DM_IGM_sim
         self.mean, self.var, self.mean_deriv, self.var_deriv = gp_dm_igm.predict()
-        #self.z_pred = gp_dm_igm.z_pred()
         self.z_pred = np.linspace(0, 2, 100)
         self.fiducial_model = FiducialModel()
         self.dm_igm_theory = self.fiducial_model.DM_IGM(self.z_pred)
@@ -20,8 +19,8 @@ class DMIGMReconstructionPlot:
         plt.figure(figsize=(8, 6))
 
         # Dados originais com barras de erro
-        plt.errorbar(self.new_z, self.DM_IGM_sim, fmt='ro', color='purple', alpha=0.5, label='Mock data')
-        plt.errorbar(od.z_obs, od.DM_IGM_obs, fmt='ro', color='k', alpha=1, label='Data')
+        plt.errorbar(self.new_z, self.DM_IGM_sim, color='red', alpha=0.5, fmt='ro', label='Mock data', ms=2)
+        #plt.errorbar(od.z_obs, od.DM_IGM_obs, fmt='ro', color='k', alpha=1, label='Data')
 
         # Função predita pelo GP
         plt.plot(self.z_pred, self.mean, 'k-', label='GP Reconstruction', lw=2)
@@ -30,14 +29,14 @@ class DMIGMReconstructionPlot:
         plt.fill_between(self.z_pred.flatten(), 
                          self.mean.flatten() - 1*np.sqrt(self.var.flatten()), 
                          self.mean.flatten() + 1*np.sqrt(self.var.flatten()), 
-                         alpha=0.5, color='k', label='1σ')
+                         alpha=0.5, color='green', label='1σ')
         plt.fill_between(self.z_pred.flatten(), 
                          self.mean.flatten() - 2*np.sqrt(self.var.flatten()), 
                          self.mean.flatten() + 2*np.sqrt(self.var.flatten()), 
-                         alpha=0.3, color='gray', label='2σ')
+                         alpha=0.3, color='green', label='2σ')
 
         # Modelo fiducial
-        plt.plot(self.z_pred, self.dm_igm_theory, 'b--', label='Fiducial model')
+        #plt.plot(self.z_pred, self.dm_igm_theory, 'b--', label='Fiducial model')
 
         plt.xlabel('Redshift ($z$)', fontsize=14)
         plt.ylabel('$DM_{IGM}$ (pc/cm³)', fontsize=14)
@@ -49,20 +48,20 @@ class DMIGMReconstructionPlot:
 
         # Plotar as derivadas
         plt.figure(figsize=(8, 6))
-        plt.plot(self.z_pred, self.mean_deriv.flatten(), 'k-', label='Derivative reconstrution')
+        plt.plot(self.z_pred, self.mean_deriv.flatten(), 'k-', label='GP reconstrution')
 
         # Adicionar curvas sombreadas de 1σ e 2σ para a derivada
         plt.fill_between(self.z_pred.flatten(), 
                         self.mean_deriv.flatten() - 1*np.sqrt(self.var_deriv.flatten()), 
                         self.mean_deriv.flatten() + 1*np.sqrt(self.var_deriv.flatten()), 
-                        alpha=0.3, color='k', label='1σ')
+                        alpha=0.6, color='green', label='1σ')
         plt.fill_between(self.z_pred.flatten(), 
                         self.mean_deriv.flatten() - 2*np.sqrt(self.var_deriv.flatten()), 
                         self.mean_deriv.flatten() + 2*np.sqrt(self.var_deriv.flatten()), 
-                        alpha=0.2, color='gray', label='2σ')
+                        alpha=0.2, color='green', label='2σ')
 
         # Derivada de DM_IGM
-        plt.plot(self.z_pred.flatten(), self.dm_igm_deriv, 'b--', label='Model derivative')
+        #plt.plot(self.z_pred.flatten(), self.dm_igm_deriv, 'b--', label='Model derivative')
 
         plt.xlabel('Redshift (z)', fontsize=14)
         plt.ylabel('$dDM_{IGM}/dz$ (pc/cm$^{3}$)', fontsize=14)
