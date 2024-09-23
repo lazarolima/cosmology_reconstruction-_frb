@@ -100,9 +100,12 @@ class GPReconstructionDMIGM_noSim:
         
         # Configurar o kernel
         if kernel_params is None:
-            kernel_params = {'input_dim': 1, 'variance': 100., 'lengthscale': 0.1}
+            kernel_params = {'input_dim': 1, 'variance': 1., 'lengthscale': 1.}
         
-        self.kernel = GPy.kern.RBF(**kernel_params)
+        self.k1 = GPy.kern.RBF(**kernel_params)
+        self.k2 = GPy.kern.RBF(1., 100., 10)
+        self.kernel = self.k1 + self.k2
+        #self.kernel = GPy.kern.RBF(**kernel_params)
         self.model = GPy.models.GPRegression(self.X, self.Y, self.kernel)
         
         # Definir a variância do ruído
@@ -118,3 +121,5 @@ class GPReconstructionDMIGM_noSim:
         mean, var = self.model.predict(self.z_pred())
         mean_deriv, var_deriv = self.model.predict_jacobian(self.z_pred())
         return mean, var, mean_deriv, var_deriv
+
+
