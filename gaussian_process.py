@@ -17,6 +17,7 @@ class GPReconstructionH:
         if kernel_params is None:
             kernel_params = {'input_dim': 1, 'variance': 100., 'lengthscale': 0.1}
         
+        #self.kernel = GPy.kern.RBF(**kernel_params)
         self.kernel = GPy.kern.RBF(**kernel_params)
         self.model = GPy.models.GPRegression(self.X, self.Y, self.kernel)
         
@@ -102,17 +103,19 @@ class GPReconstructionDMIGM_noSim:
         if kernel_params is None:
             kernel_params = {'input_dim': 1, 'variance': 1., 'lengthscale': 1.}
         
-        self.k1 = GPy.kern.RBF(**kernel_params)
-        self.k2 = GPy.kern.RBF(1., 100., 10)
-        self.kernel = self.k1 + self.k2
-        #self.kernel = GPy.kern.RBF(**kernel_params)
-        self.model = GPy.models.GPRegression(self.X, self.Y, self.kernel)
+        self.kernel = GPy.kern.RBF(**kernel_params)
+
+        self.noise = np.mean(self.error_val**2)
+
+        self.model = GPy.models.GPRegression(X=self.X, Y=self.Y, kernel=self.kernel,noise_var=self.noise)
         
         # Definir a variância do ruído
-        self.model.Gaussian_noise.variance = np.mean(self.error_val**2)
-        
+        #self.model.Gaussian_noise.variance = np.mean(self.error_val**2)
+
     def optimize(self, num_restarts=10, verbose=False):
-        self.model.optimize_restarts(num_restarts=num_restarts, verbose=verbose)
+        # Otimizar com um otimizador robusto
+        self.model.optimize(optimizer='lbfgs', max_iters=1000)
+        self.model.optimize_restarts(num_restarts=num_restarts, verbose=verbose, robust=True, parallel=True)
         
     def z_pred(self, num_points=100):
         return np.linspace(0, 2, num_points).reshape(-1, 1)

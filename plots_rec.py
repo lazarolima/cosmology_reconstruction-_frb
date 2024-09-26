@@ -9,7 +9,6 @@ class DMIGMReconstructionPlot:
         self.new_z = new_z
         self.DM_IGM_sim = DM_IGM_sim
         self.mean, self.var, self.mean_deriv, self.var_deriv = gp_dm_igm.predict()
-        #self.mean, self.var, self.mean_deriv, self.var_deriv = gp_dm_igm.predict_with_derivatives()
         self.z_pred = np.linspace(0, 2, 100)
         self.fiducial_model = FiducialModel()
         self.dm_igm_theory = self.fiducial_model.DM_IGM(self.z_pred)

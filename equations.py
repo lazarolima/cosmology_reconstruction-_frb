@@ -119,4 +119,52 @@ class H_Model:
         mean_deriv_interp = self.interp_mean_deriv(z)
         xe = 0.875
         result = self.factor * (1 + z) * fIGM * xe / mean_deriv_interp
-        return result      
+        return result    
+
+
+# Include your fiducial models for H(z) and DM_IGM(z)
+class DM_IGM_model:
+
+    def __init__(self):
+        # Constants 
+        self.c: float = 2.998e+8
+        self.m_p: float = 1.672e-27
+        self.pi: float = np.pi
+        self.G_n: float = 6.674e-11
+        self.xe_fid: float = 0.875
+        
+        # Precalculate factor
+        self.factor: float = 1.0504e-42 * 3 * self.c / (8 * self.pi * self.G_n * self.m_p)
+        
+    def H_std_new(self, z, Omega_m):
+        return np.sqrt(Omega_m * (1 + z) ** 3 + 1 - Omega_m)
+
+    def I(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type):
+
+        H_th = self.H_std_new(z, Omega_m)
+
+        # Select parameterization based on model_type
+        if model_type == 'constant':
+            fIGM = f_IGM
+        elif model_type == 'p2':
+            fIGM = Parameterization.f_IGM_p2(z, f_IGM, param)
+        elif model_type == 'p3':
+            fIGM = Parameterization.f_IGM_p3(z, f_IGM, param)
+        elif model_type == 'p4':
+            fIGM = Parameterization.f_IGM_Linder(z, f_IGM, param)
+        else:
+            raise ValueError("Model type must be 'constant', 'p2', 'p3', or 'p4'.")
+
+        return self.xe_fid * fIGM * self.factor * Omega_b * H_today ** 2 * (1 + z) / H_th
+
+    def DM_IGM(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type):
+        # Default f_IGM to 0.83 and set model_type to 'constant' if f_IGM is None
+        if f_IGM is None:
+            f_IGM = 0.83
+            model_type = 'constant'
+
+        if np.isscalar(z):
+            return quad(self.I(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type), 0, z)[0]
+        else:
+            return np.array([quad(self.I(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type), 0, zi)[0] for zi in z])
+  

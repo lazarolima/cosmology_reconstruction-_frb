@@ -25,48 +25,59 @@ class H_data:
 
 class FRB_data:
 
-    @staticmethod
-    def z_frb():
-        return np.array([0.0337, 0.098, 0.1178, 0.16, 0.19273, 0.234, 0.2365, 0.2432, 0.291, 0.3214, 0.3305, 
-                         0.3688, 0.378, 0.4755, 0.522, 0.66])
+    def __init__(self, n_frb):
+        self.n_frb: int = n_frb
 
-    @staticmethod
-    def DM_frb():
-        return np.array([348.8, 413.52, 338.7, 380.25, 557.0, 506.92, 504.13, 297.5, 363.6, 361.42, 536.0, 
-                         577.8, 321.4, 589.27, 593.1, 760.8])
+    def select_data(self):
 
-    @staticmethod
-    def error_frb():
-        return np.array([0.2, 0.5, 0.5, 0.4, 2.0, 0.04, 2.0, 0.05, 0.3, 0.06, 8.0, 0.02, 0.2, 0.03, 0.4, 0.6])
+        if self.n_frb == 16:
+    
+            z_obs = np.array([0.0337, 0.098, 0.1178, 0.16, 0.19273, 0.234, 0.2365, 0.2432, 0.291, 0.3214, 0.3305, 
+                            0.3688, 0.378, 0.4755, 0.522, 0.66])
 
-    @staticmethod
-    def DM_ISM_frb():
-        return np.array([200.0, 123.2, 37.2, 27.0, 188.0, 44.7, 38.0, 33.0, 57.3, 40.5, 152.0, 36.0, 57.83, 
-                         102.0, 56.4, 37.0])
+            DM_obs = np.array([348.8, 413.52, 338.7, 380.25, 557.0, 506.92, 504.13, 297.5, 363.6, 361.42, 536.0, 
+                            577.8, 321.4, 589.27, 593.1, 760.8])
 
-data = FRB_data()
-z_obs = data.z_frb()
-DM_obs = data.DM_frb()
-DM_obs_error = data.error_frb()
+            DM_obs_error = np.array([0.2, 0.5, 0.5, 0.4, 2.0, 0.04, 2.0, 0.05, 0.3, 0.06, 8.0, 0.02, 0.2, 0.03, 0.4, 0.6])
 
-# DM of the observed interstellar medium
-DM_ISM_obs = data.DM_ISM_frb()
+            DM_ISM_obs = np.array([200.0, 123.2, 37.2, 27.0, 188.0, 44.7, 38.0, 33.0, 57.3, 40.5, 152.0, 36.0, 57.83, 
+                            102.0, 56.4, 37.0])
+        
+        if self.n_frb == 50:
+            # Load your data
+            dm_frb = np.loadtxt('data/frb_50data.txt', skiprows=1)
+            z_obs = dm_frb[:, 1]
+            DM_obs = dm_frb[:, 2]
+            error_plus = dm_frb[:, 3]
+            error_minus = dm_frb[:, 4]
 
-# DM of the Milky Way halo
-DM_MW_halo = 50.0
+        return  z_obs, DM_obs, DM_obs_error, DM_ISM_obs, error_plus, error_minus
 
-# Observed local DM and its error
-DM_MW_obs = DM_MW_halo + DM_ISM_obs
-DM_MW_obs_error = 10.0
+class Final_data:
+    def __init__(self, z_obs, DM_obs, DM_obs_error):
+        self.z_obs = z_obs
+        self.DM_obs = DM_obs
+        self.DM_obs_error = DM_obs_error
 
-# Observed extragalactic DM and its error
-DM_obs_ext = DM_obs - DM_MW_obs
-DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2)
+    def ext_data(self):
 
-# DM of the host galaxy and its error
+        # DM of the Milky Way halo
+        DM_MW_halo = 50.0
+
+        # Observed local DM and its error
+        DM_MW_obs = DM_MW_halo + DM_ISM_obs
+        DM_MW_obs_error = 10.0
+
+        # Observed extragalactic DM and its error
+        DM_obs_ext = DM_obs - DM_MW_obs
+        DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2)
+
+        return DM_obs_ext, DM_obs_ext_error
+
+"""# DM of the host galaxy and its error
 DM_host = 100 / (1 + z_obs)
 DM_host_error = 50 / (1 + z_obs)
 
 # DM of the observed intergalactic medium and its error
 DM_IGM_obs = DM_obs_ext - DM_host
-DM_IGM_obs_error = np.sqrt(DM_obs_ext_error ** 2 + DM_host_error ** 2)
+DM_IGM_obs_error = np.sqrt(DM_obs_ext_error ** 2 + DM_host_error ** 2)"""
