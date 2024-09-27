@@ -122,8 +122,8 @@ class H_Model:
         return result    
 
 
-# Include your fiducial models for H(z) and DM_IGM(z)
-class DM_IGM_model:
+# Include your models for DM_IGM(z) and DM_ext(z)
+class DM_EXT_model:
 
     def __init__(self):
         # Constants 
@@ -155,16 +155,41 @@ class DM_IGM_model:
         else:
             raise ValueError("Model type must be 'constant', 'p2', 'p3', or 'p4'.")
 
-        return self.xe_fid * fIGM * self.factor * Omega_b * H_today ** 2 * (1 + z) / H_th
+        return self.xe_fid * fIGM * self.factor * Omega_b * H_today * (1 + z) / H_th
+    
 
     def DM_IGM(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type):
-        # Default f_IGM to 0.83 and set model_type to 'constant' if f_IGM is None
+
+        integrand = self.I(z, Omega_b, Omega_m, H_today, f_IGM, param, model_type)
+        
+        if np.isscalar(z):
+            # Single value of z
+            return quad(integrand, 0, z)[0]
+        else:
+            # Array of z values
+            return np.array([quad(integrand, 0, zi)[0] for zi in z])
+        
+    def DM_ext_th(self, z, f_IGM, DM_host_0, model_type, Omega_b=None, Omega_m=None, H_today=None, param=None):
+
+        """# Set default values for cosmological parameters and f_IGM if not provided
         if f_IGM is None:
             f_IGM = 0.83
-            model_type = 'constant'
+            model_type = 'constant'"""
+        
+        if Omega_b is None:
+            Omega_b = 0.0408
+        
+        if Omega_m is None:
+            Omega_m = 0.3
+        
+        if H_today is None:
+            H_today = 70.0
 
-        if np.isscalar(z):
-            return quad(self.I(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type), 0, z)[0]
-        else:
-            return np.array([quad(self.I(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type), 0, zi)[0] for zi in z])
+        # Calculate the IGM contribution to the DM
+        dm_igm_th = self.DM_IGM(z, Omega_b, Omega_m, H_today, f_IGM, param, model_type)
+
+        # Return the total extragalactic DM: IGM contribution + host galaxy contribution
+        return dm_igm_th + DM_host_0 / (1 + z)
+
+
   

@@ -42,37 +42,47 @@ class FRB_data:
 
             DM_ISM_obs = np.array([200.0, 123.2, 37.2, 27.0, 188.0, 44.7, 38.0, 33.0, 57.3, 40.5, 152.0, 36.0, 57.83, 
                             102.0, 56.4, 37.0])
+            
+            # DM of the Milky Way halo
+            DM_MW_halo = 50.0
+
+            # Observed local DM and its error
+            DM_MW_obs = DM_MW_halo + DM_ISM_obs
+            DM_MW_obs_error = 10.0
+
+            # Observed extragalactic DM and its error
+            DM_obs_ext = DM_obs - DM_MW_obs
+            DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2)
+
+            return z_obs, DM_obs_ext, DM_obs_ext_error
+
         
-        if self.n_frb == 50:
+        elif self.n_frb == 50:
             # Load your data
             dm_frb = np.loadtxt('data/frb_50data.txt', skiprows=1)
             z_obs = dm_frb[:, 1]
             DM_obs = dm_frb[:, 2]
             error_plus = dm_frb[:, 3]
             error_minus = dm_frb[:, 4]
+            DM_ISM_obs = np.array([200.0, 123.2, 37.2, 27.0, 188.0, 44.7, 38.0, 33.0, 57.3, 40.5, 152.0, 36.0, 57.83, 
+                            102.0, 56.4, 37.0])
+            DM_ISM_obs_new = np.mean(DM_ISM_obs)
 
-        return  z_obs, DM_obs, DM_obs_error, DM_ISM_obs, error_plus, error_minus
+            # DM of the Milky Way halo
+            DM_MW_halo = 50.0
 
-class Final_data:
-    def __init__(self, z_obs, DM_obs, DM_obs_error):
-        self.z_obs = z_obs
-        self.DM_obs = DM_obs
-        self.DM_obs_error = DM_obs_error
+            # Observed local DM and its error
+            DM_MW_obs = DM_MW_halo + DM_ISM_obs_new
+            DM_MW_obs_error = 10.0
 
-    def ext_data(self):
+            # Observed extragalactic DM and its error
+            DM_obs_ext = DM_obs - DM_MW_obs
+            DM_obs_ext_error_plus = np.sqrt(error_plus ** 2 + DM_MW_obs_error ** 2)
+            DM_obs_ext_error_minus = np.sqrt(error_minus ** 2 + DM_MW_obs_error ** 2)
 
-        # DM of the Milky Way halo
-        DM_MW_halo = 50.0
-
-        # Observed local DM and its error
-        DM_MW_obs = DM_MW_halo + DM_ISM_obs
-        DM_MW_obs_error = 10.0
-
-        # Observed extragalactic DM and its error
-        DM_obs_ext = DM_obs - DM_MW_obs
-        DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2)
-
-        return DM_obs_ext, DM_obs_ext_error
+            return z_obs, DM_obs_ext, DM_obs_ext_error_plus, DM_obs_ext_error_minus
+        else:
+            raise ValueError("Invalid number of FRBs. Choose 16 or 50.")
 
 """# DM of the host galaxy and its error
 DM_host = 100 / (1 + z_obs)

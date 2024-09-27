@@ -6,18 +6,25 @@ class LikelihoodFunction:
         self.model_func = model_func
     
     def log_likelihood(self, params, z_values, y_obs, errors=None, err_neg=None, err_pos=None):
+        # Compute the model values
         y_model = self.model_func(z_values, *params)
-
-        if errors is None:
-            # Caso assimétrico
-            errors = np.where(y_model > y_obs, err_pos, err_neg)
-            loglike = -0.5 * np.sum(((y_model - y_obs) / errors) ** 2)
         
-            # Caso simétrico
-        if err_neg is None or err_pos is None:
-            loglike = -0.5 * np.sum(((y_model - y_obs) / errors) ** 2)            
+        # Asymmetric case
+        if errors is None and err_neg is not None and err_pos is not None:
+            # Select the appropriate error based on the condition
+            error_new = np.where(y_model > y_obs, err_pos, err_neg)
+            loglike = -0.5 * np.sum(((y_model - y_obs) / error_new) ** 2)
+
+        # Symmetric case
+        elif errors is not None and err_neg is None and err_pos is None:
+            loglike = -0.5 * np.sum(((y_model - y_obs) / errors) ** 2)
+
+        # Invalid error configuration
+        else:
+            raise ValueError("Error: Provide either symmetric errors (errors) or asymmetric errors (err_neg and err_pos).")
         
         return loglike
+
 
 class Priors:
     
