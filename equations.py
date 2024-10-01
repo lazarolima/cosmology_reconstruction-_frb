@@ -160,12 +160,13 @@ class DM_EXT_model:
 
     def DM_IGM(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type):
 
-        integrand = self.I(z, Omega_b, Omega_m, H_today, f_IGM, param, model_type)
+        integrand = lambda z: self.I(z, Omega_b, Omega_m, H_today, f_IGM, param, model_type)
         
         if np.isscalar(z):
             return quad(integrand, 0, z)[0]
         else:
             return np.array([quad(integrand, 0, zi)[0] for zi in z])
+
         
     def DM_ext_th(self, z, f_IGM, DM_host_0, model_type, Omega_b=None, Omega_m=None, H_today=None, param=None):
 

@@ -59,11 +59,12 @@ class FRB_data:
         
         elif self.n_frb == 50:
             # Load your data
-            dm_frb = np.loadtxt('data/frb_50data.txt', skiprows=1)
-            z_obs = dm_frb[:, 1]
-            DM_obs = dm_frb[:, 2]
-            error_plus = dm_frb[:, 3]
-            error_minus = dm_frb[:, 4]
+            #dm_frb = np.loadtxt('data/frb_50data.txt', skiprows=1)
+            dm_frb = np.loadtxt('data/frb_50data.txt', skiprows=1, usecols=range(1, 5))
+            z_obs = dm_frb[:, 0]
+            DM_obs = dm_frb[:, 1]
+            error_plus = dm_frb[:, 2]
+            error_minus = dm_frb[:, 3]
             DM_ISM_obs = np.array([200.0, 123.2, 37.2, 27.0, 188.0, 44.7, 38.0, 33.0, 57.3, 40.5, 152.0, 36.0, 57.83, 
                             102.0, 56.4, 37.0])
             DM_ISM_obs_new = np.mean(DM_ISM_obs)
