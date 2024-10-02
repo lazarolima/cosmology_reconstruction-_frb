@@ -25,7 +25,7 @@ class FiducialModel:
         return self.H_today * np.sqrt(self.Omega_m * (1 + z) ** 3 + 1 - self.Omega_m)
 
     def I(self, z):
-        H_th = self.H_std(z)
+        H_th = lambda z: self.H_std(z)
         return self.xe_fid * self.f_IGM_fid * self.factor * (1 + z) / H_th
 
     def DM_IGM(self, z):
@@ -135,13 +135,34 @@ class DM_EXT_model:
         
         # Precalculate factor
         self.factor: float = 1.0504e-42 * 3 * self.c / (8 * self.pi * self.G_n * self.m_p)
+
+    # Insert here your dark energy parametrization 
+    def func_de(self, z, omega_0, omega_a, param_type):
+        if  param_type == 'constant':
+            f_z = (1 + z) ** (3 * (1 + omega_0))
+        elif param_type == 'CPL':
+            f_z = (1 + z) ** (3 * (1 + omega_0 + omega_a)) * np.exp(- 3 * omega_a * z / (1 + z))
+        elif param_type == 'BA':
+            f_z = (1 + z) ** (3 * (1 + omega_0)) * (1 + z ** 2) ** (1.5 * omega_a)
+        else:
+            raise ValueError("Parameterization type must be 'constant', 'CPL', or 'BA'.")
+        return f_z
         
-    def H_std_new(self, z, Omega_m):
-        return np.sqrt(Omega_m * (1 + z) ** 3 + 1 - Omega_m)
+    def H_std_new(self, z, Omega_m, cosmo_type, omega_0, omega_a, param_type):
 
-    def I(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type):
+        func_new = self.func_de(z, omega_0, omega_a, param_type)
 
-        H_th = self.H_std_new(z, Omega_m)
+        if cosmo_type == 'standard':
+            H_z = np.sqrt(Omega_m * (1 + z) ** 3 + 1 - Omega_m)
+        elif cosmo_type == 'non_standard':
+            H_z = np.sqrt(Omega_m * (1 + z) ** 3 + (1 - Omega_m) * func_new)
+        else:
+            raise ValueError("Cosmology type must be 'standard' or 'non_standard'.")
+        return H_z
+
+    def I(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type, cosmo_type, omega_0, omega_a, param_type):
+
+        H_th = self.H_std_new(z, Omega_m, cosmo_type, omega_0, omega_a, param_type)
 
         # Select parameterization based on model_type
         if model_type == 'constant':
@@ -158,9 +179,9 @@ class DM_EXT_model:
         return self.xe_fid * fIGM * self.factor * Omega_b * H_today * (1 + z) / H_th
     
 
-    def DM_IGM(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type):
+    def DM_IGM(self, z, Omega_b, Omega_m, H_today, f_IGM, param, model_type, cosmo_type, omega_0, omega_a, param_type):
 
-        integrand = lambda z: self.I(z, Omega_b, Omega_m, H_today, f_IGM, param, model_type)
+        integrand = lambda z: self.I(z, Omega_b, Omega_m, H_today, f_IGM, param, model_type, cosmo_type, omega_0, omega_a, param_type)
         
         if np.isscalar(z):
             return quad(integrand, 0, z)[0]
@@ -168,12 +189,13 @@ class DM_EXT_model:
             return np.array([quad(integrand, 0, zi)[0] for zi in z])
 
         
-    def DM_ext_th(self, z, f_IGM, DM_host_0, model_type, Omega_b=None, Omega_m=None, H_today=None, param=None):
+    def DM_ext_th(self, z, f_IGM, DM_host_0, model_type, cosmo_type, param_type, omega_0=None, omega_a=None, Omega_b=None, Omega_m=None, H_today=None, param=None):
 
-        """# Set default values for cosmological parameters and f_IGM if not provided
-        if f_IGM is None:
-            f_IGM = 0.83
-            model_type = 'constant'"""
+        if omega_0 is  None:
+            omega_0 = - 1
+
+        if omega_a is None:
+            omega_a = 0
         
         if Omega_b is None:
             Omega_b = 0.0408
@@ -185,7 +207,7 @@ class DM_EXT_model:
             H_today = 70.0
 
         # Calculate the IGM contribution to the DM
-        dm_igm_th = self.DM_IGM(z, Omega_b, Omega_m, H_today, f_IGM, param, model_type)
+        dm_igm_th = self.DM_IGM(z, Omega_b, Omega_m, H_today, f_IGM, param, model_type, cosmo_type, omega_0, omega_a, param_type)
 
         # Return the total extragalactic DM: IGM contribution + host galaxy contribution
         return dm_igm_th + DM_host_0 / (1 + z)

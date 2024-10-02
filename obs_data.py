@@ -59,8 +59,8 @@ class FRB_data:
         
         elif self.n_frb == 50:
             # Load your data
-            #dm_frb = np.loadtxt('data/frb_50data.txt', skiprows=1)
             dm_frb = np.loadtxt('data/frb_50data.txt', skiprows=1, usecols=range(1, 5))
+            #dm_frb = np.loadtxt('data/frb_50data_symetric_errors.txt', skiprows=1, usecols=range(1, 5))
             z_obs = dm_frb[:, 0]
             DM_obs = dm_frb[:, 1]
             error_plus = dm_frb[:, 2]
