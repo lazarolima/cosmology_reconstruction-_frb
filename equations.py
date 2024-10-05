@@ -189,8 +189,8 @@ class DM_EXT_model:
             return np.array([quad(integrand, 0, zi)[0] for zi in z])
 
         
-    def DM_ext_th(self, z, f_IGM, DM_host_0, model_type, cosmo_type, param_type, omega_0=None, omega_a=None, Omega_b=None, Omega_m=None, H_today=None, param=None):
-
+    #def DM_ext_th(self, z, f_IGM, DM_host_0, model_type, cosmo_type, param_type, omega_0=None, omega_a=None, Omega_b=None, Omega_m=None, H_today=None, param=None):
+    def DM_ext_th(self, z, f_IGM, A, beta, model_type, cosmo_type, param_type, omega_0=None, omega_a=None, Omega_b=None, Omega_m=None, H_today=None, param=None):
         if omega_0 is  None:
             omega_0 = - 1
 
@@ -198,19 +198,21 @@ class DM_EXT_model:
             omega_a = 0
         
         if Omega_b is None:
-            Omega_b = 0.0408
+            Omega_b = 0.04897
         
         if Omega_m is None:
-            Omega_m = 0.3
+            Omega_m = 0.30966
+            #Omega_m = 0.315
         
         if H_today is None:
-            H_today = 70.0
+            H_today = 73
 
         # Calculate the IGM contribution to the DM
         dm_igm_th = self.DM_IGM(z, Omega_b, Omega_m, H_today, f_IGM, param, model_type, cosmo_type, omega_0, omega_a, param_type)
 
         # Return the total extragalactic DM: IGM contribution + host galaxy contribution
-        return dm_igm_th + DM_host_0 / (1 + z)
+        #return dm_igm_th + DM_host_0 / (1 + z)
+        return dm_igm_th + A * (1 + z) ** beta
 
 
   

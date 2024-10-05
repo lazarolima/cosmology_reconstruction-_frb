@@ -50,9 +50,16 @@ class FRB_data:
             DM_MW_obs = DM_MW_halo + DM_ISM_obs
             DM_MW_obs_error = 10.0
 
+            # Host galaxy error
+            DM_host_error = 50 / (1 + z_obs)
+
+            # DM_IGM error
+            DM_IGM_error = 173.8 * z_obs ** 0.4
+
             # Observed extragalactic DM and its error
             DM_obs_ext = DM_obs - DM_MW_obs
-            DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2)
+            DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2 + DM_host_error ** 2)
+            #DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2)
 
             return z_obs, DM_obs_ext, DM_obs_ext_error
 
@@ -76,19 +83,42 @@ class FRB_data:
             DM_MW_obs = DM_MW_halo + DM_ISM_obs_new
             DM_MW_obs_error = 10.0
 
+            # Host galaxy error
+            DM_host_error = 50 / (1 + z_obs)
+
+            # DM_IGM error
+            DM_IGM_error = 173.8 * z_obs ** 0.4
+
             # Observed extragalactic DM and its error
             DM_obs_ext = DM_obs - DM_MW_obs
-            DM_obs_ext_error_plus = np.sqrt(error_plus ** 2 + DM_MW_obs_error ** 2)
-            DM_obs_ext_error_minus = np.sqrt(error_minus ** 2 + DM_MW_obs_error ** 2)
+            DM_obs_ext_error_plus = np.sqrt(error_plus ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2 + DM_host_error ** 2)
+            DM_obs_ext_error_minus = np.sqrt(error_minus ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2 + DM_host_error ** 2)
 
             return z_obs, DM_obs_ext, DM_obs_ext_error_plus, DM_obs_ext_error_minus
+        
+        elif self.n_frb == 64:
+            # Load your data
+            dm_frb = np.loadtxt('data/frb_64data.txt', skiprows=1, usecols=range(2, 6))
+            #dm_frb = np.loadtxt('data/frb_50data_symetric_errors.txt', skiprows=1, usecols=range(1, 5))
+            z_obs = dm_frb[:, 0]
+            DM_obs = dm_frb[:, 1]
+            DM_obs_error = dm_frb[:, 2]
+
+            # Observed local DM and its error
+            DM_MW_obs = dm_frb[:, 3]
+            DM_MW_obs_error = 10.0
+
+            # Host galaxy error
+            DM_host_error = 50 / (1 + z_obs)
+
+            # DM_IGM error
+            DM_IGM_error = 173.8 * z_obs ** 0.4
+
+            # Observed extragalactic DM and its error
+            DM_obs_ext = DM_obs - DM_MW_obs
+            DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2 + DM_host_error ** 2)
+            #DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2)
+
+            return z_obs, DM_obs_ext, DM_obs_ext_error
         else:
-            raise ValueError("Invalid number of FRBs. Choose 16 or 50.")
-
-"""# DM of the host galaxy and its error
-DM_host = 100 / (1 + z_obs)
-DM_host_error = 50 / (1 + z_obs)
-
-# DM of the observed intergalactic medium and its error
-DM_IGM_obs = DM_obs_ext - DM_host
-DM_IGM_obs_error = np.sqrt(DM_obs_ext_error ** 2 + DM_host_error ** 2)"""
+            raise ValueError("Invalid number of FRBs. Choose 16, 50 or 64.")
