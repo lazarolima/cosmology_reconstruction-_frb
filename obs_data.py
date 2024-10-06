@@ -52,6 +52,7 @@ class FRB_data:
 
             # Host galaxy error
             DM_host_error = 50 / (1 + z_obs)
+            #DM_host_error = 50 
 
             # DM_IGM error
             DM_IGM_error = 173.8 * z_obs ** 0.4
@@ -85,6 +86,7 @@ class FRB_data:
 
             # Host galaxy error
             DM_host_error = 50 / (1 + z_obs)
+            #DM_host_error = 50
 
             # DM_IGM error
             DM_IGM_error = 173.8 * z_obs ** 0.4
@@ -110,6 +112,7 @@ class FRB_data:
 
             # Host galaxy error
             DM_host_error = 50 / (1 + z_obs)
+            #DM_host_error = 50
 
             # DM_IGM error
             DM_IGM_error = 173.8 * z_obs ** 0.4
