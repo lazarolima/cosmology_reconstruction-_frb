@@ -60,7 +60,7 @@ class FRB_data:
             # Observed extragalactic DM and its error
             DM_obs_ext = DM_obs - DM_MW_obs
             DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2 + DM_host_error ** 2)
-            #DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2)
+            #DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_host_error ** 2)
 
             return z_obs, DM_obs_ext, DM_obs_ext_error
 
@@ -98,7 +98,7 @@ class FRB_data:
 
             return z_obs, DM_obs_ext, DM_obs_ext_error_plus, DM_obs_ext_error_minus
         
-        elif self.n_frb == 64:
+        elif self.n_frb == 63:
             # Load your data
             dm_frb = np.loadtxt('data/frb_64data.txt', skiprows=1, usecols=range(2, 6))
             #dm_frb = np.loadtxt('data/frb_50data_symetric_errors.txt', skiprows=1, usecols=range(1, 5))
@@ -120,7 +120,7 @@ class FRB_data:
             # Observed extragalactic DM and its error
             DM_obs_ext = DM_obs - DM_MW_obs
             DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2 + DM_host_error ** 2)
-            #DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2)
+            #DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_host_error ** 2)
 
             return z_obs, DM_obs_ext, DM_obs_ext_error
         else:
