@@ -191,6 +191,7 @@ class DM_EXT_model:
         
     #def DM_ext_th(self, z, f_IGM, DM_host_0, model_type, cosmo_type, param_type, omega_0=None, omega_a=None, Omega_b=None, Omega_m=None, H_today=None, param=None):
     def DM_ext_th(self, z, f_IGM, A, beta, model_type, cosmo_type, param_type, omega_0=None, omega_a=None, Omega_b=None, Omega_m=None, H_today=None, param=None):
+
         if omega_0 is  None:
             omega_0 = - 1
 
