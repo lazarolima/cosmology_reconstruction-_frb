@@ -2,6 +2,7 @@ from scipy.integrate import quad
 from scipy.interpolate import interp1d
 import numpy as np
 from scipy.interpolate import InterpolatedUnivariateSpline
+from scipy.special import hyp2f1
 
 # Include your fiducial models for H(z) and DM_IGM(z)
 class FiducialModel:
@@ -214,6 +215,59 @@ class DM_EXT_model:
         # Return the total extragalactic DM: IGM contribution + host galaxy contribution
         #return dm_igm_th + DM_host_0 / (1 + z)
         return dm_igm_th + A * (1 + z) ** beta
+    
+
+class Hubble:
+    def __init__(self):
+        pass 
+
+    # Insert here your dark energy parametrization 
+    def func_DE(self, z, omega_0, omega_a, param_type):
+        if  param_type == 'constant':
+            f_z = (1 + z) ** (3 * (1 + omega_0))
+        elif param_type == 'CPL':
+            f_z = (1 + z) ** (3 * (1 + omega_0 + omega_a)) * np.exp(- 3 * omega_a * z / (1 + z))
+        elif param_type == 'BA':
+            f_z = (1 + z) ** (3 * (1 + omega_0)) * (1 + z ** 2) ** (1.5 * omega_a)
+        else:
+            raise ValueError("Parameterization type must be 'constant', 'CPL', or 'BA'.")
+        return f_z
+        
+    def H_func(self, z, H_0, Omega_m, cosmo_type, param_type, omega_0=None, omega_a=None):
+
+        func_new = self.func_DE(z, omega_0, omega_a, param_type)
+
+        if cosmo_type == 'standard':
+            H_z = H_0 * np.sqrt(Omega_m * (1 + z) ** 3 + 1 - Omega_m)
+        elif cosmo_type == 'non_standard':
+            H_z = H_0 * np.sqrt(Omega_m * (1 + z) ** 3 + (1 - Omega_m) * func_new)
+        else:
+            raise ValueError("Cosmology type must be 'standard' or 'non_standard'.")
+        return H_z
+
+
+class Modulus_sne:
+
+    def __init__(self):
+        self.c: int = 299792 # km/s
+        
+    def Lumi_std(self, z, H_0, Omega_m, cosmo_type, param_type, omega_0, omega_a):
+
+        hubble = Hubble()
+
+        integrand = lambda z: 1 / hubble.H_func(z, H_0, Omega_m, cosmo_type, param_type, omega_0, omega_a)
+
+        if np.isscalar(z):
+            return self.c * (1 + z) * quad(integrand, 0, z)[0]
+        else:
+            return self.c * (1 + z) * np.array([quad(integrand, 0, zi)[0] for zi in z])
+        
+    # Distance modulis
+    def Modulo_std(self, z, H_0, Omega_m, cosmo_type, param_type, omega_0=None, omega_a=None):
+
+        lumi_std = self.Lumi_std(z, H_0, Omega_m, cosmo_type, param_type, omega_0, omega_a)
+
+        return 5 * np.log10(lumi_std) + 25
 
 
   

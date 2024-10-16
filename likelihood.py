@@ -26,7 +26,6 @@ class LikelihoodFunction:
         
         return loglike
 
-
 """class Priors:
     
     def __init__(self, param_names, intervals):
@@ -80,6 +79,132 @@ class Priors:
             else:
                 raise ValueError(f"Dist must be uniform, gaussian, log-normal, etc. Got {dist}")
             
+        return params
+    
+
+# New classes for join analysis (like FRBs + H(z) data) 
+
+"""class JointLikelihoodFunction:
+
+    def __init__(self, model_funcs):
+        
+        #Inicializa a função de verossimilhança conjunta.
+        
+        #:param model_funcs: Um dicionário onde as chaves são os nomes dos conjuntos de dados
+        #                    e os valores são as funções do modelo correspondentes.
+        
+        self.model_funcs = model_funcs
+
+    def log_likelihood(self, params, data_sets):
+        total_loglike = 0
+        
+        for data_name, (z_values, y_obs, errors) in data_sets.items():
+            model_func = self.model_funcs[data_name]
+            
+            # Filtra os parâmetros necessários para cada modelo
+            filtered_params = {k: v for k, v in params.items() if k in model_func.__code__.co_varnames}
+            
+            y_model = model_func(z_values, **filtered_params)
+            
+            if isinstance(errors, tuple):  # Caso assimétrico
+                err_neg, err_pos = errors
+                error_new = np.where(y_model > y_obs, err_pos, err_neg)
+            else:  # Caso simétrico
+                error_new = errors
+            
+            loglike = -0.5 * np.sum(((y_model - y_obs) / error_new) ** 2)
+            total_loglike += loglike
+        
+        return total_loglike"""
+
+class JointLikelihoodFunction:
+
+    def __init__(self, model_funcs):
+        """
+        Inicializa a função de verossimilhança conjunta.
+        
+        :param model_funcs: Um dicionário onde as chaves são os nomes dos conjuntos de dados
+                            e os valores são as funções do modelo correspondentes.
+        """
+        self.model_funcs = model_funcs
+
+    def log_likelihood(self, params, data_sets):
+        total_loglike = 0
+        
+        for data_name, data_info in data_sets.items():
+            model_func = self.model_funcs[data_name]
+            
+            # Filtra os parâmetros necessários para cada modelo
+            filtered_params = {k: v for k, v in params.items() if k in model_func.__code__.co_varnames}
+            
+            # Para SNe, a entrada tem (z_values, y_obs, cov_matrix)
+            if data_name == "SNe":
+                z_values, y_obs, cov_matrix = data_info
+                y_model = model_func(z_values, **filtered_params)
+                
+                # Calcula a diferença entre o modelo e a observação
+                delta = y_model - y_obs
+                
+                # Calcula o chi^2 utilizando a matriz de covariância inversa
+                cov_inv = np.linalg.inv(cov_matrix)
+                chi2 = np.sum(np.dot(delta.T, np.dot(cov_inv, delta)))
+                
+                # Adiciona à verossimilhança total
+                total_loglike += -0.5 * chi2
+            
+            # Para outros conjuntos de dados (FRBs, H_0), a entrada tem (z_values, y_obs, errors)
+            else:
+                z_values, y_obs, errors = data_info
+                y_model = model_func(z_values, **filtered_params)
+                
+                # Caso de erros assimétricos
+                if isinstance(errors, tuple):
+                    err_neg, err_pos = errors
+                    error_new = np.where(y_model > y_obs, err_pos, err_neg)
+                else:  # Erros simétricos
+                    error_new = errors
+                
+                # Cálculo da verossimilhança gaussiana simples
+                loglike = -0.5 * np.sum(((y_model - y_obs) / error_new) ** 2)
+                total_loglike += loglike
+        
+        return total_loglike
+
+
+class JointPriors:
+    def __init__(self, param_configs):
+        """
+        Inicializa os priors conjuntos.
+        
+        :param param_configs: Um dicionário onde as chaves são os nomes dos parâmetros
+                              e os valores são tuplas (intervalo, distribuição).
+        """
+        self.param_configs = param_configs
+        self.param_names = list(param_configs.keys())
+    
+    def prior_transform(self, cube):
+        """
+        Transforma os valores do cubo unitário em distribuições de prior.
+        
+        :param cube: Array de valores em [0, 1] do ultranest.
+        :return: Array de parâmetros transformados.
+        """
+        params = np.zeros_like(cube)
+        
+        for i, param_name in enumerate(self.param_names):
+            (low, high), dist = self.param_configs[param_name]
+            
+            if dist == 'uniform':
+                params[i] = low + (high - low) * cube[i]
+            elif dist == 'gaussian':
+                mu, sigma = (low + high) / 2, (high - low) / 6
+                params[i] = stats.norm.ppf(cube[i], loc=mu, scale=sigma)
+            elif dist == 'log-normal':
+                mu, sigma = np.log((low + high) / 2), (np.log(high) - np.log(low)) / 6
+                params[i] = np.exp(stats.norm.ppf(cube[i], loc=mu, scale=sigma))
+            else:
+                raise ValueError(f"Distribuição não suportada: {dist}")
+        
         return params
 
 
