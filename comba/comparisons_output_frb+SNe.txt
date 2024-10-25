@@ -1,0 +1,33 @@
+
+Comparisons for Sample_frb:
+Comparing 2 models...
+wCDM vs CPL: lnB_ij = 0.19 -> Inconclusive
+
+Bayes Factor inconclusive. Comparing AIC...
+
+AIC Results:
+wCDM: AIC = 176.65
+CPL: AIC = 179.03
+Best model according to AIC: wCDM
+
+Comparisons for Sample_sne:
+Comparing 2 models...
+wCDM vs CPL: lnB_ij = -0.07 -> Inconclusive
+
+Bayes Factor inconclusive. Comparing AIC...
+
+AIC Results:
+wCDM: AIC = 2008.87
+CPL: AIC = 2010.73
+Best model according to AIC: wCDM
+
+Comparisons for Sample_sne_frb:
+Comparing 2 models...
+wCDM vs CPL: lnB_ij = -0.29 -> Inconclusive
+
+Bayes Factor inconclusive. Comparing AIC...
+
+AIC Results:
+wCDM: AIC = 2177.33
+CPL: AIC = 2178.74
+Best model according to AIC: wCDM

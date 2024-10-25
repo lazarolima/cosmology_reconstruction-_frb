@@ -1,30 +1,21 @@
 import numpy as np
 import pandas as pd
 from scipy import linalg
-from cobaya.model import get_model
 
 # H(z) Observational data and its errors
 
 class H_data:
 
     def H_z_data(self):
-
-        """z_val = np.array([0.17, 0.179, 0.199, 0.2, 0.27, 0.28, 0.352, 0.3802, 0.4, 0.4004, 0.4247, 0.44497,
-                         0.4783, 0.48, 0.593, 0.68, 0.781, 0.875, 0.88, 0.9, 1.037, 1.3, 1.363, 1.43, 1.53, 1.75, 1.965])
-    
-        H_z = np.array([83, 75, 75, 72.9, 77, 88.8, 83, 83, 95, 77, 87.1, 92.8, 
-                         80.9, 97, 104, 92, 105, 125, 90, 117, 154, 168, 160, 177, 140, 202, 186.5])
-
-        errors = np.array([8, 4, 5, 29.6, 14, 36.6, 14, 13.5, 17, 10.2, 11.2, 12.9, 9, 62, 13, 8, 12,
-                         17, 40, 23, 20, 17, 33.6, 18, 14, 40, 50.4])"""
         
-        Hz_data = pd.read_csv("data/Hz35data.txt", delim_whitespace=True)
+        data_path_H = 'data/Hz35data.txt'
+        Hz_data = pd.read_csv(data_path_H, delim_whitespace=True)
 
-        z_val = Hz_data['z']
-        H_z = Hz_data['H(z)']
-        errors = Hz_data['sigma']
+        self.z_val = Hz_data['z']
+        self.H_z = Hz_data['H(z)']
+        self.errors = Hz_data['sigma']
         
-        return  z_val, H_z, errors
+        return  self.z_val, self.H_z, self.errors
 
 
 # FRB data and erros associated (16 point of date)
@@ -77,7 +68,8 @@ class FRB_data:
         
         elif self.n_frb == 50:
             # Load your data
-            dm_frb = np.loadtxt('data/frb_50data.txt', skiprows=1, usecols=range(1, 5))
+            data_path_frb_50 = 'data/frb_50data.txt'
+            dm_frb = np.loadtxt(data_path_frb_50, skiprows=1, usecols=range(1, 5))
             #dm_frb = np.loadtxt('data/frb_50data_symetric_errors.txt', skiprows=1, usecols=range(1, 5))
             z_obs = dm_frb[:, 0]
             DM_obs = dm_frb[:, 1]
@@ -110,7 +102,8 @@ class FRB_data:
         
         elif self.n_frb == 66:
             # Load your data
-            dm_frb = np.loadtxt('data/frb_66data.txt', skiprows=1, usecols=range(2, 6))
+            data_path_frb_66 = 'data/frb_66data.txt'
+            dm_frb = np.loadtxt(data_path_frb_66, skiprows=1, usecols=range(2, 6))
             #dm_frb = np.loadtxt('data/frb_50data_symetric_errors.txt', skiprows=1, usecols=range(1, 5))
             z_obs = dm_frb[:, 0]
             DM_obs = dm_frb[:, 1]
@@ -147,17 +140,14 @@ class SNe_data:
         if self.sample_sne == 'Pantheon+':
 
             # Carregar os dados do SNe
-            sne_data = pd.read_csv("data/Pantheon+SH0ES.dat", delim_whitespace=True)
+            sne_data = pd.read_csv('data/Pantheon+SH0ES.dat', delim_whitespace=True)
             
             # Extrair as colunas desejadas
             self.z_sne = sne_data['zCMB']
-            self.mu_sne = sne_data['MU_SH0ES']
-            """self.dmb_sne = sne_data['MU_SH0ES_ERR_DIAG']
-            cov = self.dmb_sne ** 2
-            dcov = np.diag(cov)"""
+            self.mu_sne = sne_data['m_b_corr'] 
             
             # Ler a matriz de covariância
-            with open("data/Pantheon+SH0ES_STAT+SYS.cov", 'r') as f:
+            with open('data/Pantheon+SH0ES_STAT+SYS.cov', 'r') as f:
                 # Lê o número de linhas/colunas da matriz (primeira linha)
                 N = int(f.readline().strip())
                 
@@ -176,17 +166,14 @@ class SNe_data:
         if self.sample_sne == 'Union3':
             
             # Carregar os dados do SNe
-            sne_data = pd.read_csv("data/lcparam_full.txt", delim_whitespace=True)
+            sne_data = pd.read_csv('data/lcparam_full.txt', delim_whitespace=True)
             
             # Extrair as colunas desejadas
             self.z_sne = sne_data['zcmb']
-            self.mu_sne = sne_data['mb']  + 19.214
-            """self.dmb_sne = sne_data['dmb']
-            cov = self.dmb_sne ** 2
-            dcov = np.diag(cov)"""
+            self.mu_sne = sne_data['mb']
 
             # Ler a matriz de covariância
-            with open("data/mag_covmat.txt", 'r') as f:
+            with open('data/mag_covmat.txt', 'r') as f:
                 # Lê o número de linhas/colunas da matriz (primeira linha)
                 N = int(f.readline().strip())
                 
@@ -194,9 +181,13 @@ class SNe_data:
                 data = np.loadtxt(f)
             
                 # Reconstrói a matriz de covariância NxN
-                self.cov_matrix = np.reshape(data, (N, N))
+                cov_matrix = np.reshape(data, (N, N))
+
+                # Calcula a inversa usando decomposição de Cholesky
+                self.cov_inv = linalg.cho_solve(linalg.cho_factor(cov_matrix), 
+                           np.identity(cov_matrix.shape[0]))
                 
-            return self.z_sne, self.mu_sne, self.cov_matrix
+            return self.z_sne, self.mu_sne, self.cov_inv
 
 
 

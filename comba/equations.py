@@ -3,6 +3,7 @@ from scipy.interpolate import interp1d
 import numpy as np
 from scipy.interpolate import InterpolatedUnivariateSpline
 from scipy.special import hyp2f1
+from joblib import Parallel, delayed
 
 # Include your fiducial models for H(z) and DM_IGM(z)
 class FiducialModel:
@@ -187,6 +188,9 @@ class DM_EXT_model:
         if np.isscalar(z):
             return quad(integrand, 0, z)[0]
         else:
+            """# Paralelizando o cálculo para múltiplos redshifts
+            results = Parallel(n_jobs=-1)(delayed(quad)(integrand, 0, zi)[0] for zi in z)
+            return np.array(results)"""
             return np.array([quad(integrand, 0, zi)[0] for zi in z])
 
     #def DM_ext_th(self, z, f_IGM, A, beta, model_type, cosmo_type, param_type, omega_0=None, omega_a=None, Omega_bh2=None, Omega_m=None, param=None):
@@ -259,14 +263,23 @@ class Modulus_sne:
         if np.isscalar(z):
             return self.c * (1 + z) * quad(integrand, 0, z)[0]
         else:
+            """# Paralelizando o cálculo para múltiplos redshifts
+            results = Parallel(n_jobs=-1)(delayed(quad)(integrand, 0, zi)[0] for zi in z)
+            return self.c * (1 + z) * np.array(results)"""
             return self.c * (1 + z) * np.array([quad(integrand, 0, zi)[0] for zi in z])
         
     # Distance modulis
     def Modulo_std(self, z, H_0, Omega_m, cosmo_type, param_type, omega_0=None, omega_a=None):
 
+        if omega_0 is  None:
+            omega_0 = - 1
+
+        if omega_a is None:
+            omega_a = 0
+
         lumi_std = self.Lumi_std(z, H_0, Omega_m, cosmo_type, param_type, omega_0, omega_a)
 
-        return 5 * np.log10(lumi_std) + 25
+        return 5 * np.log10(lumi_std) + 25 - 19.214
 
 
 

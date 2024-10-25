@@ -232,3 +232,64 @@ class SaveResults:
         with open(self.output_file, 'w') as f:
             f.write("")  # Write an empty string to clear the file.
 
+
+class CompareMCMCResults:
+    """
+    A class to compare uncertainties between two MCMC models using the formula
+    for Relative Error Reduction and save the results to a .txt file.
+    """
+
+    def __init__(self, output_file):
+        """
+        Initializes the CompareMCMCResults class.
+
+        Parameters:
+        - output_file: Name of the .txt file where comparison results will be saved.
+        """
+        self.output_file = output_file
+
+    def compare_errors(self, mcsample1, mcsample2, model1_name, model2_name):
+        """
+        Compares the uncertainties between two MCMC models using the 
+        Relative Error Reduction formula.
+
+        Parameters:
+        - mcsample1: MCSamples object for the first model.
+        - mcsample2: MCSamples object for the second model.
+        - model1_name: Name of the first model (e.g., 'SNe').
+        - model2_name: Name of the second model (e.g., 'SNe + FRB').
+        """
+        # Extract marginal statistics from the MCSamples objects
+        stats_model1 = mcsample1.getMargeStats()
+        stats_model2 = mcsample2.getMargeStats()
+
+        with open(self.output_file, 'a') as f:
+            f.write(f"Comparing {model1_name} vs {model2_name}:\n")
+            f.write("-" * 50 + "\n")
+
+            param_names = [param.name for param in stats_model1.names]
+
+            for param in param_names:
+                # Extract lower and upper uncertainties for both models
+                model1_lower = abs(stats_model1.parWithName(param).limits[0].lower)
+                model2_lower = abs(stats_model2.parWithName(param).limits[0].lower)
+
+                model1_upper = abs(stats_model1.parWithName(param).limits[0].upper)
+                model2_upper = abs(stats_model2.parWithName(param).limits[0].upper)
+
+                # Calculate relative error reductions
+                reduction_lower = ((model1_lower - model2_lower) / model1_lower) * 100
+                reduction_upper = ((model1_upper - model2_upper) / model1_upper) * 100
+
+                # Write results to file
+                f.write(f"{param}:\n")
+                f.write(f"  Lower Error Reduction: {reduction_lower:.2f}%\n")
+                f.write(f"  Upper Error Reduction: {reduction_upper:.2f}%\n")
+            f.write("\n")
+
+    def reset_file(self):
+        """Clears the content of the output file."""
+        with open(self.output_file, 'w') as f:
+            f.write("")  # Write an empty string to clear the file.
+
+
