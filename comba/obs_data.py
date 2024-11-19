@@ -7,15 +7,22 @@ from scipy import linalg
 class H_data:
 
     def H_z_data(self):
-        
-        data_path_H = 'data/Hz35data.txt'
-        Hz_data = pd.read_csv(data_path_H, delim_whitespace=True)
+        # Carrega os dados do arquivo
+        Hz_data = np.loadtxt('data/Hz35data.txt', skiprows=1)
 
-        self.z_val = Hz_data['z']
-        self.H_z = Hz_data['H(z)']
-        self.errors = Hz_data['sigma']
-        
-        return  self.z_val, self.H_z, self.errors
+        # Extraindo z, H(z) e erros
+        self.z_val = Hz_data[:, 0]
+        self.H_z = Hz_data[:, 1]
+        self.errors = Hz_data[:, 2]
+
+        # Aplicando a máscara para z < 1
+        mask = self.z_val < 1.018
+        self.z_val = self.z_val[mask]
+        self.H_z = self.H_z[mask]
+        self.errors = self.errors[mask]
+
+        return self.z_val, self.H_z, self.errors
+
 
 
 # FRB data and erros associated (16 point of date)
@@ -104,7 +111,6 @@ class FRB_data:
             # Load your data
             data_path_frb_66 = 'data/frb_66data.txt'
             dm_frb = np.loadtxt(data_path_frb_66, skiprows=1, usecols=range(2, 6))
-            #dm_frb = np.loadtxt('data/frb_50data_symetric_errors.txt', skiprows=1, usecols=range(1, 5))
             z_obs = dm_frb[:, 0]
             DM_obs = dm_frb[:, 1]
             DM_obs_error = dm_frb[:, 2]
@@ -115,7 +121,7 @@ class FRB_data:
 
             # Host galaxy error
             DM_host_error = 50 / (1 + z_obs)
-            #DM_host_error = 50
+            # DM_host_error = 50
 
             # DM_IGM error
             DM_IGM_error = 173.8 * z_obs ** 0.4
@@ -123,54 +129,134 @@ class FRB_data:
             # Observed extragalactic DM and its error
             DM_obs_ext = DM_obs - DM_MW_obs
             DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2 + DM_host_error ** 2)
-            #DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_host_error ** 2)
+            # DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_host_error ** 2)
+            # DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2)
+            # DM_obs_ext_error = np.sqrt(DM_MW_obs_error ** 2 + DM_IGM_error ** 2 + DM_host_error ** 2)
+
+            return z_obs, DM_obs_ext, DM_obs_ext_error #DM_IGM_error
+        
+        elif self.n_frb == 5000:
+            # Load your data
+            data_path_frb_mock = 'data/redshift_dist_mock_frblip.txt'
+            dm_frb = np.loadtxt(data_path_frb_mock, skiprows=1)
+            z_obs = dm_frb[:, 0]
+            DM_obs_ext = dm_frb[:, 1]
+
+            # Observed local DM and its error
+            DM_MW_obs_error = 10.0
+
+            # Host galaxy error
+            DM_host_error = 50 / (1 + z_obs)
+            # DM_host_error = 50
+
+            DM_obs_error = 0.5
+
+            # DM_IGM error
+            DM_IGM_error = 173.8 * z_obs ** 0.4
+
+            DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_IGM_error ** 2 + DM_host_error ** 2)
+            # DM_IGM_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2 + DM_host_error ** 2)
+            # DM_obs_ext_error = np.sqrt(DM_obs_error ** 2 + DM_MW_obs_error ** 2)
 
             return z_obs, DM_obs_ext, DM_obs_ext_error
         else:
-            raise ValueError("Invalid number of FRBs. Choose 16, 50 or 64.")
+            raise ValueError("Invalid number of FRBs. Choose 16, 50, 64 or 5000.")
         
 
 class SNe_data:
     
-    def __init__(self, sample_sne):
-        self.sample_sne: str =  sample_sne
+    def __init__(self, sample_sne: str):
+        self.sample_sne = sample_sne
 
     def load_data(self):
+        """
+        Carrega os dados do conjunto de SNe escolhido, realiza filtros necessários e
+        calcula a matriz inversa de covariância.
+        """
+        if self.sample_sne == 'Pantheon+SH0ES':
 
-        if self.sample_sne == 'Pantheon+':
+            # Carregar os dados de supernovas
+            sne_data = pd.read_csv('data/Pantheon+SH0ES.dat', sep='\s+')
 
-            # Carregar os dados do SNe
-            sne_data = pd.read_csv('data/Pantheon+SH0ES.dat', delim_whitespace=True)
+            # Filtrar SNe com zCMB > 0.01 ou usadas como calibradoras (Cefeidas) e também z < 1
+            #zmask = ((sne_data['zCMB'] > 0.01) | (sne_data['IS_CALIBRATOR'].astype(bool))) & (sne_data['zCMB'] < 1.018)
+            zmask = ((sne_data['zCMB'] > 0.01)) & (sne_data['zCMB'] < 1.018)
+            filtered_data = sne_data[zmask]
+
+            # Extrair colunas relevantes
+            self.z_sne = filtered_data['zCMB'].values
+            #self.z_alt = filtered_data['zHEL'].values  # Alternativa redshift heliocêntrico
+            self.mu_sne = filtered_data['MU_SH0ES'].values # Magnitude corrigida + 19.245 (Mb)
+            #self.mu_sigma = filtered_data['m_b_corr_err_DIAG'].values   
             
-            # Extrair as colunas desejadas
-            self.z_sne = sne_data['zCMB']
-            self.mu_sne = sne_data['m_b_corr'] 
-            
-            # Ler a matriz de covariância
+            # Ler a matriz de covariância 
             with open('data/Pantheon+SH0ES_STAT+SYS.cov', 'r') as f:
-                # Lê o número de linhas/colunas da matriz (primeira linha)
-                N = int(f.readline().strip())
-                
-                # Lê os dados da matriz achatada (NxN elementos em uma única coluna)
-                data = np.loadtxt(f)
-            
-                # Reconstrói a matriz de covariância NxN
-                cov_matrix = np.reshape(data, (N, N))
+                N = int(f.readline().strip())  # Número de linhas/colunas
+                data = np.loadtxt(f)  # Ler os dados em formato achatado
+                cov_matrix = np.reshape(data, (N, N))  # Reconstituir matriz NxN
 
-                # Calcula a inversa usando decomposição de Cholesky
-                self.cov_inv = linalg.cho_solve(linalg.cho_factor(cov_matrix), 
-                           np.identity(cov_matrix.shape[0]))
-                
+            # Filtrar a matriz de covariância de acordo com a máscara aplicada nos dados
+            self.cov_matrix = cov_matrix[np.ix_(zmask, zmask)] 
+
+            # Selecionar os índices filtrados
+            # idx_filtered = np.where(zmask)[0]
+            # self.cov_matrix = cov_matrix[np.ix_(idx_filtered, idx_filtered)] + self.mu_std
+
+            # Calcular a matriz inversa de covariância usando decomposição de Cholesky
+            self.cov_inv = linalg.cho_solve(
+                linalg.cho_factor(self.cov_matrix), 
+                np.identity(self.cov_matrix.shape[0])
+            )
+ 
+            # Retornar os valores processados
+            #return self.z_sne, self.z_alt, self.mu_sne, self.cov_inv
             return self.z_sne, self.mu_sne, self.cov_inv
-        
+            #return self.z_sne, self.mu_sne, self.mu_sigma
+
+
+        if self.sample_sne == 'DESY5':
+
+            # Carregar os dados de supernovas
+            sne_data = pd.read_csv('data/DES-SN5YR_HD.csv', sep=',')
+
+            # Filtrar SNe com zCMB > 0.01 ou usadas como calibradoras (Cefeidas)
+            zmask = (sne_data['zCMB'] > 0.01) & (sne_data['zCMB'] < 1.018)
+            filtered_data = sne_data[zmask]
+
+            # Extrair colunas relevantes
+            self.z_sne = filtered_data['zCMB'].values
+            self.mu_sne = filtered_data['MU'].values
+            # self.z_sne = sne_data['zCMB']
+            # self.mu_sne = sne_data['MU']
+            
+            # Ler a matriz de covariância 
+            with open('data/covsys_000.txt', 'r') as f:
+                N = int(f.readline().strip())  # Número de linhas/colunas
+                data = np.loadtxt(f)  # Ler os dados em formato achatado
+                cov_matrix = np.reshape(data, (N, N))  # Reconstituir matriz NxN
+
+            # Filtrar a matriz de covariância de acordo com a máscara aplicada nos dados
+            self.cov_matrix = cov_matrix[np.ix_(zmask, zmask)] 
+
+            # Calcular a matriz inversa de covariância usando decomposição de Cholesky
+            # self.cov_inv = linalg.cho_solve(
+            #     linalg.cho_factor(self.cov_matrix), 
+            #     np.identity(self.cov_matrix.shape[0])
+            # )
+ 
+            # Retornar os valores processados
+            return self.z_sne, self.mu_sne, self.cov_matrix
+            #return self.z_sne, self.mu_sne, self.mu_sigma
+
+
         if self.sample_sne == 'Union3':
             
             # Carregar os dados do SNe
-            sne_data = pd.read_csv('data/lcparam_full.txt', delim_whitespace=True)
+            sne_data = pd.read_csv('data/lcparam_full.txt', sep='\s+')
             
             # Extrair as colunas desejadas
-            self.z_sne = sne_data['zcmb']
-            self.mu_sne = sne_data['mb']
+            self.z_sne = sne_data['zcmb'].values
+            self.mu_sne = sne_data['mb'].values + 19.245
 
             # Ler a matriz de covariância
             with open('data/mag_covmat.txt', 'r') as f:
@@ -181,13 +267,13 @@ class SNe_data:
                 data = np.loadtxt(f)
             
                 # Reconstrói a matriz de covariância NxN
-                cov_matrix = np.reshape(data, (N, N))
+                self.cov_matrix = np.reshape(data, (N, N))
 
                 # Calcula a inversa usando decomposição de Cholesky
-                self.cov_inv = linalg.cho_solve(linalg.cho_factor(cov_matrix), 
-                           np.identity(cov_matrix.shape[0]))
+                # self.cov_inv = linalg.cho_solve(linalg.cho_factor(cov_matrix), 
+                #            np.identity(cov_matrix.shape[0]))
                 
-            return self.z_sne, self.mu_sne, self.cov_inv
+            return self.z_sne, self.mu_sne, self.cov_matrix #self.cov_inv
 
 
 

@@ -1,5 +1,9 @@
 import numpy as np
 from scipy import stats
+from joblib import Parallel, delayed
+import pymp
+from sklearn.neighbors import KernelDensity
+from scipy.stats import gaussian_kde
 
 class LikelihoodFunction:
     
@@ -84,311 +88,102 @@ class Priors:
 
 # New classes for join analysis (like FRBs + H(z) data) 
 
-"""class JointLikelihoodFunction:
-
-    def __init__(self, model_funcs):
-        
-        Inicializa a função de verossimilhança conjunta.
-        
-        :param model_funcs: Um dicionário onde as chaves são os nomes dos conjuntos de dados
-                            e os valores são as funções do modelo correspondentes.
-        
-        self.model_funcs = model_funcs
-
-    def log_likelihood(self, params, data_sets):
-        total_loglike = 0
-        
-        for data_name, data_info in data_sets.items():
-            model_func = self.model_funcs[data_name]
-            
-            # Filtra os parâmetros necessários para cada modelo
-            filtered_params = {k: v for k, v in params.items() if k in model_func.__code__.co_varnames}
-            
-            # Para SNe, a entrada tem (z_values, y_obs, cov_matrix)
-            if data_name == "SNe":
-                z_values, y_obs, cov_matrix = data_info
-                y_model = model_func(z_values, **filtered_params)
-                
-                # Calcula a diferença entre o modelo e a observação
-                delta = y_model - y_obs
-                
-                # Calcula o chi^2 utilizando a matriz de covariância inversa
-                chi2 = np.dot(delta.T, np.dot(cov_matrix, delta))
-                
-                # Adiciona à verossimilhança total
-                total_loglike += -0.5 * chi2
-            
-            # Para outros conjuntos de dados (FRBs, H_0), a entrada tem (z_values, y_obs, errors)
-            else:
-                z_values, y_obs, errors = data_info
-                y_model = model_func(z_values, **filtered_params)
-                
-                # Caso de erros assimétricos
-                if isinstance(errors, tuple):
-                    err_neg, err_pos = errors
-                    error_new = np.where(y_model > y_obs, err_pos, err_neg)
-                else:  # Erros simétricos
-                    error_new = errors
-                
-                # Cálculo da verossimilhança gaussiana simples
-                loglike = -0.5 * np.sum(((y_model - y_obs) / error_new) ** 2)
-                total_loglike += loglike
-        
-        return total_loglike"""
-
-import numpy as np
-from desilike.likelihoods.supernovae import (
-    PantheonPlusSHOESSNLikelihood, 
-    PantheonPlusSNLikelihood, 
-    PantheonSNLikelihood
-)
-
-"""class SNe_desilike:
-    def __init__(self, cosmo):
-        self.cosmo = cosmo
-
-    def likelihood_function(self, cosmo):
-
-        from desilike import setup_logging
-
-        setup_logging()  # set up logging
-
-        likelihoods = {#'Pantheon': PantheonSNLikelihood(cosmo=cosmo),
-                    #'Pantheon+': PantheonPlusSNLikelihood(cosmo=cosmo),
-                    'Pantheon+ & SH0ES': PantheonPlusSHOESSNLikelihood(cosmo=cosmo)}
-
-        loglike = likelihoods.get('Pantheon+ & SH0ES').all_params['PantheonPlusSHOESSN.loglikelihood']
-
-        return loglike"""
-        
-
-"""class JointLikelihoodFunction:
-
-    def __init__(self, model_funcs, shared_params=None):
-        
-        Inicializa a função de verossimilhança conjunta.
-
-        :param model_funcs: Dicionário onde as chaves são nomes dos conjuntos de dados
-                            e os valores são as funções do modelo correspondentes.
-        :param shared_params: Lista opcional dos nomes dos parâmetros comuns entre modelos.
-                              Se não fornecida, todos os parâmetros serão utilizados.
-        
-        self.model_funcs = model_funcs
-        self.shared_params = shared_params
-
-    def log_likelihood(self, params, data_sets):
-        
-        Calcula a verossimilhança total para um conjunto de dados fornecido.
-
-        :param params: Dicionário com todos os parâmetros fornecidos.
-        :param data_sets: Dicionário com conjuntos de dados e informações associadas.
-        :return: Verossimilhança total.
-        
-        total_loglike = 0
-
-        for data_name, data_info in data_sets.items():
-            model_func = self.model_funcs[data_name]
-
-            # Filtra os parâmetros relevantes para cada modelo
-            model_params = {
-                k: v for k, v in params.items() if k in model_func.__code__.co_varnames
-            }
-
-            if data_name == "SNe":  # Para supernovas
-                z_values, y_obs, cov_matrix = data_info
-                y_model = model_func(z_values, **model_params)
-
-                delta = y_model - y_obs
-                chi2 = np.dot(delta.T, np.dot(cov_matrix, delta))
-                total_loglike += -0.5 * chi2
-
-            else:  # Para FRBs ou outros conjuntos
-                z_values, y_obs, errors = data_info
-                y_model = model_func(z_values, **model_params)
-
-                if isinstance(errors, tuple):  # Erros assimétricos
-                    err_neg, err_pos = errors
-                    error_new = np.where(y_model > y_obs, err_pos, err_neg)
-                else:  # Erros simétricos
-                    error_new = errors
-
-                loglike = -0.5 * np.sum(((y_model - y_obs) / error_new) ** 2)
-                total_loglike += loglike
-
-        return total_loglike
-
-    def marginalize_non_shared_params(self, params):
-        
-        Marginaliza os parâmetros não compartilhados (se aplicável).
-
-        :param params: Dicionário com todos os parâmetros fornecidos.
-        :return: Dicionário contendo apenas os parâmetros compartilhados (se especificados).
-        
-        # Se shared_params não foi fornecido, retorna todos os parâmetros
-        if self.shared_params is None:
-            return params
-
-        # Retorna apenas os parâmetros compartilhados
-        return {k: v for k, v in params.items() if k in self.shared_params}"""
-
-"""class JointPriors:
-    def __init__(self, param_configs):
-        
-        Inicializa os priors conjuntos.
-        
-        :param param_configs: Um dicionário onde as chaves são os nomes dos parâmetros
-                              e os valores são tuplas (intervalo, distribuição).
-        
-        self.param_configs = param_configs
-        self.param_names = list(param_configs.keys())
+class JointLikelihoodFunction:
     
-    def prior_transform(self, cube):
-        
-        Transforma os valores do cubo unitário em distribuições de prior.
-        
-        :param cube: Array de valores em [0, 1] do ultranest.
-        :return: Array de parâmetros transformados.
-        
-        params = np.zeros_like(cube)
-        
-        for i, param_name in enumerate(self.param_names):
-            (low, high), dist = self.param_configs[param_name]
-            
-            if dist == 'uniform':
-                params[i] = low + (high - low) * cube[i]
-            elif dist == 'gaussian':
-                mu, sigma = (low + high) / 2, (high - low) / 6
-                params[i] = stats.norm.ppf(cube[i], loc=mu, scale=sigma)
-            elif dist == 'log-normal':
-                mu, sigma = np.log((low + high) / 2), (np.log(high) - np.log(low)) / 6
-                params[i] = np.exp(stats.norm.ppf(cube[i], loc=mu, scale=sigma))
-            else:
-                raise ValueError(f"Distribuição não suportada: {dist}")
-        
-        return params"""
-
-
-import numpy as np
-from desilike.likelihoods.supernovae import (
-    PantheonPlusSHOESSNLikelihood, 
-    PantheonPlusSNLikelihood, 
-    PantheonSNLikelihood
-)
-from desilike import setup_logging
-
-class JointLikelihoodFunction(PantheonPlusSHOESSNLikelihood):
-    """
-    Classe que combina a verossimilhança de supernovas Pantheon+ & SH0ES com outras fontes de dados.
-    """
-
-    def __init__(self, model_funcs=None, cosmo=None, shared_params=None, **kwargs):
-        """
-        Inicializa a classe e seus argumentos, aproveitando a inicialização da classe pai.
-
-        Parameters:
-        -----------
-        model_funcs : dict, optional
-            Dicionário com funções de modelos para cada dataset adicional.
-        cosmo : Cosmology, optional
-            Instância de cosmologia para uso na análise.
-        shared_params : list, optional
-            Lista de parâmetros compartilhados entre modelos.
-        kwargs : dict
-            Argumentos adicionais a serem passados para a classe pai.
-        """
-        # Guarda os argumentos específicos desta classe
-        self.model_funcs = model_funcs if model_funcs else {}
+    def __init__(self, model_funcs=None, shared_params=None):
+        # Inicializa atributos específicos
+        self.model_funcs = model_funcs or {}
         self.shared_params = shared_params
-        self.cosmo = cosmo
 
-        # Filtra os kwargs para remover argumentos específicos desta classe
-        parent_kwargs = {k: v for k, v in kwargs.items() 
-                        if k not in ['model_funcs', 'shared_params']}
-        
-        # Inicializa a classe pai apenas com os argumentos relevantes
-        super().__init__(**parent_kwargs)
-
-        setup_logging()
-
-    def initialize(self, *args, **kwargs):
+    def estimate_pdf_frb(self, dm_obs, dm_ext_samples, sigma):
         """
-        Sobrescreve o método initialize para garantir que apenas argumentos válidos
-        sejam passados para a classe pai.
-        """
-        # Filtra os kwargs para remover argumentos específicos desta classe
-        parent_kwargs = {k: v for k, v in kwargs.items() 
-                        if k not in ['model_funcs', 'shared_params']}
-        
-        # Chama o initialize da classe pai com os argumentos filtrados
-        super().initialize(*args, **parent_kwargs, cosmo=self.cosmo)
-        #super().get()
-
-    def log_likelihood(self, params, data_sets=None):
-        """
-        Calcula a log-verossimilhança combinada para todos os datasets.
-
-        Parameters:
-        -----------
-        params : dict
-            Dicionário com os parâmetros do modelo.
-        data_sets : dict, optional
-            Dicionário com os dados adicionais para análise.
+        Estima a log-PDF considerando o erro total associado ao DM_obs_ext_error,
+        usando `scipy.stats.gaussian_kde`.
+ss
+        Args:
+            dm_obs (float): Valor observado.
+            dm_ext_samples (array): Amostras para ajustar o KDE.
+            sigma (float): Erro associado ao DM_obs_ext.
 
         Returns:
-        --------
-        float
-            Log-verossimilhança total combinada.
+            float: Log-PDF ajustado no ponto dm_obs.
         """
+        # Ajusta a estimativa KDE com as amostras
+        kde = gaussian_kde(dm_ext_samples)
+
+        # Estima a densidade em `dm_obs`
+        pdf = kde(dm_obs)  # Retorna a densidade no ponto dm_obs
+        log_pdf = np.log(pdf[0])  # Obtem o log-PDF
+
+        # Ajusta a log-PDF para incluir o erro associado
+        log_pdf_adjusted = log_pdf - 0.5 * np.log(2 * np.pi * sigma**2) - (dm_obs**2) / (2 * sigma**2)
+
+        return log_pdf_adjusted
+
+
+    def log_likelihood(self, params, data_sets=None):
+        """Calcula a log-verossimilhança combinada para vários datasets."""
+        
         total_loglike = 0
 
-        # Calcula a verossimilhança para "Pantheon+ & SH0ES", se aplicável
-        if self.cosmo is not None:
-            loglike = self.calculate()
-            total_loglike += loglike
-
-        # Verifica e processa outros datasets, se fornecidos
+        # Log-verossimilhança para outros datasets fornecidos
         if data_sets:
             for data_name, data_info in data_sets.items():
                 if data_name not in self.model_funcs:
-                    raise ValueError(f"Modelo para {data_name} não fornecido.")
+                    raise ValueError(f"Modelo para {data_name} não foi fornecido.")
 
+                # Marginaliza parâmetros não compartilhados
+                model_params = self.marginalize_non_shared_params(params) if data_name in ["SNe", "CC"] else params
+                
                 model_func = self.model_funcs[data_name]
-                model_params = {k: v for k, v in params.items() 
-                              if k in model_func.__code__.co_varnames}
+                model_params = {k: v for k, v in model_params.items() if k in model_func.__code__.co_varnames}
 
-                if data_name == "SNe":  # Dados de supernovas
-                    z_values, y_obs, cov_matrix = data_info
+                if data_name == "SNe":
+                    # Dados para supernovas (SNe)
+                    z_values, y_obs, cov_matrix_inv = data_info
                     y_model = model_func(z_values, **model_params)
+
                     delta = y_model - y_obs
-                    chi2 = np.dot(delta.T, np.dot(cov_matrix, delta))
+                    chi2 = np.dot(delta.T, np.dot(cov_matrix_inv, delta))
                     total_loglike += -0.5 * chi2
 
-                else:  # Outros datasets (como FRBs)
+                # elif data_name == "PDF":
+                #     from equations import Cosmography
+                #     dm_ext = Cosmography()
+                #     z_values, y_obs, error = data_info
+                #     y_model = model_func(z_values, **model_params)
+
+                #     dm_ext_th = dm_ext.DM_ext_cmy_pdf(z=z_values, A=model_params['A'], beta=model_params['beta'], sigma_igm=error, dm_ext_obs=y_obs, dm_ext_th_values=y_model)
+                    
+                #     logpdf = np.sum(dm_ext_th)
+
+                #     total_loglike += logpdf
+
+                elif data_name == "PDF":
+                    z_values, y_obs, errors = data_info
+                    y_model = model_func(z_values, **model_params)
+        
+                    for dm_obs, dm_ext_samples, sigma in zip(y_obs, y_model, errors):
+                        loglike = self.estimate_pdf_frb(dm_obs=dm_obs, dm_ext_samples=dm_ext_samples, sigma=sigma)
+
+                        total_loglike += np.sum(loglike)
+
+                else:
+                    # Outros datasets (genéricos)
                     z_values, y_obs, errors = data_info
                     y_model = model_func(z_values, **model_params)
                     error_new = (
                         np.where(y_model > y_obs, errors[1], errors[0]) 
                         if isinstance(errors, tuple) else errors
                     )
-                    loglike = -0.5 * np.sum(((y_model - y_obs) / error_new) ** 2)
+                    loglike = - 0.5 * np.sum(((y_model - y_obs) / error_new) ** 2) 
                     total_loglike += loglike
 
         return total_loglike
 
+
     def marginalize_non_shared_params(self, params):
-        """
-        Marginaliza os parâmetros que não são compartilhados entre modelos.
-
-        Parameters:
-        -----------
-        params : dict
-            Dicionário com todos os parâmetros fornecidos.
-
-        Returns:
-        --------
-        dict
-            Dicionário contendo apenas os parâmetros compartilhados.
-        """
+        """Marginaliza os parâmetros que não são compartilhados."""
         if self.shared_params is None:
             return params
         return {k: v for k, v in params.items() if k in self.shared_params}
@@ -400,7 +195,10 @@ class JointPriors:
         Inicializa os priors conjuntos.
         
         :param param_configs: Um dicionário onde as chaves são os nomes dos parâmetros
-                              e os valores são tuplas (intervalo, distribuição) ou dicionários.
+                              e os valores são tuplas para a distribuição desejada:
+                              - Prior uniforme: ((low, high), 'uniform')
+                              - Prior gaussiana: ((mu, sigma), 'gaussian')
+                              - Prior log-normal: ((low, high), 'log-normal')
         """
         self.param_configs = param_configs
         self.param_names = list(param_configs.keys())
@@ -411,9 +209,9 @@ class JointPriors:
         """
         converted = {}
         for param in cosmo_params:
-            param_name = param.name  # Nome do parâmetro, ex.: 'Omega_m'
-            limits = param.limits  # Acesse os limites diretamente
-            converted[param_name] = (tuple(limits), 'uniform')  # Formato esperado
+            param_name = param.name
+            limits = param.limits
+            converted[param_name] = (tuple(limits), 'uniform')  # Formato esperado para prior uniforme
         return converted
 
     def prior_transform(self, cube):
@@ -428,18 +226,22 @@ class JointPriors:
         for i, param_name in enumerate(self.param_names):
             config = self.param_configs[param_name]
             
-            # Verifica se a configuração é um dicionário (Cosmoprimo) ou uma tupla
-            if isinstance(config, dict):
-                low, high = config['prior']['limits']
-                dist = 'uniform'  # Assume uniforme se não especificado
+            # Desempacotando a configuração da distribuição
+            if isinstance(config[0], tuple) and len(config[0]) == 2:
+                if config[1] == 'uniform':
+                    low, high = config[0]
+                elif config[1] == 'gaussian':
+                    mu, sigma = config[0]
+                elif config[1] == 'log-normal':
+                    low, high = config[0]
+                dist = config[1]
             else:
-                (low, high), dist = config
-            
-            # Aplica a transformação correspondente
+                raise ValueError(f"Configuração inválida para o parâmetro {param_name}")
+
+            # Aplicando a transformação de acordo com a distribuição
             if dist == 'uniform':
                 params[i] = low + (high - low) * cube[i]
             elif dist == 'gaussian':
-                mu, sigma = (low + high) / 2, (high - low) / 6
                 params[i] = stats.norm.ppf(cube[i], loc=mu, scale=sigma)
             elif dist == 'log-normal':
                 mu, sigma = np.log((low + high) / 2), (np.log(high) - np.log(low)) / 6
@@ -448,6 +250,7 @@ class JointPriors:
                 raise ValueError(f"Distribuição não suportada: {dist}")
         
         return params
+
 
 
 

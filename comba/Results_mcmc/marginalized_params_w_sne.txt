@@ -1,0 +1,6 @@
+Marginalized limits: 0.68; 0.95; 0.99
+
+parameter   mean           sddev          lower1         upper1         limit1 lower2         upper2         limit2 lower3         upper3         limit3 
+h           7.2231981E-01  2.5073807E-03  7.1980578E-01  7.2466891E-01  two    7.1741687E-01  7.2716145E-01  two    7.1635349E-01  7.2913636E-01  two     h
+Omega_mh2   1.0398814E-01  3.3966708E-02  6.4055250E-02  1.3737813E-01  two    3.5686533E-02  1.7652886E-01  two    1.8871219E-02  1.9876414E-01  two     \Omega_{m}h^2
+omega_0    -6.6671485E-01  8.8166862E-02 -7.4583460E-01 -5.6272714E-01  two   -8.6651479E-01 -4.9224102E-01  two   -9.4600371E-01 -4.5066751E-01  two     \omega_0

@@ -256,8 +256,8 @@ class CompareMCMCResults:
         Parameters:
         - mcsample1: MCSamples object for the first model.
         - mcsample2: MCSamples object for the second model.
-        - model1_name: Name of the first model (e.g., 'SNe').
-        - model2_name: Name of the second model (e.g., 'SNe + FRB').
+        - model1_name: Name of the first model (e.g., 'Model 1').
+        - model2_name: Name of the second model (e.g., 'Model 2').
         """
         # Extract marginal statistics from the MCSamples objects
         stats_model1 = mcsample1.getMargeStats()
@@ -265,12 +265,16 @@ class CompareMCMCResults:
 
         with open(self.output_file, 'a') as f:
             f.write(f"Comparing {model1_name} vs {model2_name}:\n")
-            f.write("-" * 50 + "\n")
+            f.write("-" * 40 + "\n")
 
             param_names = [param.name for param in stats_model1.names]
 
             for param in param_names:
-                # Extract lower and upper uncertainties for both models
+                central_value1 = stats_model1.parWithName(param).mean
+                central_value2 = stats_model2.parWithName(param).mean
+                std1 = stats_model1.parWithName(param).err
+                std2 = stats_model2.parWithName(param).err
+
                 model1_lower = abs(stats_model1.parWithName(param).limits[0].lower)
                 model2_lower = abs(stats_model2.parWithName(param).limits[0].lower)
 
@@ -281,15 +285,42 @@ class CompareMCMCResults:
                 reduction_lower = ((model1_lower - model2_lower) / model1_lower) * 100
                 reduction_upper = ((model1_upper - model2_upper) / model1_upper) * 100
 
-                # Write results to file
+                # Calculate % difference in central values
+                diff_central = ((central_value2 - central_value1) / central_value1) * 100
+
                 f.write(f"{param}:\n")
+                f.write(f"  % Difference in Central Value: {diff_central:.2f}%\n")
+        
+                # Write results to file
                 f.write(f"  Lower Error Reduction: {reduction_lower:.2f}%\n")
                 f.write(f"  Upper Error Reduction: {reduction_upper:.2f}%\n")
+
+                # Print interpretation of the reduction results
+                f.write("  Interpretation:\n")
+                if reduction_lower > 0:
+                    f.write(f"    Lower: {model2_name} has lower uncertainty (improvement).\n")
+                else:
+                    f.write(f"    Lower: {model2_name} has higher uncertainty (worse performance).\n")
+
+                if reduction_upper > 0:
+                    f.write(f"    Upper: {model2_name} has lower uncertainty (improvement).\n")
+                else:
+                    f.write(f"    Upper: {model2_name} has higher uncertainty (worse performance).\n")
+
+                # Calculate and write relative uncertainties
+                rel_uncertainty1 = (std1 / abs(central_value1)) * 100
+                rel_uncertainty2 = (std2 / abs(central_value2)) * 100
+
+                f.write(f"  Relative Uncertainty ({model1_name}): {rel_uncertainty1:.2f}%\n")
+                f.write(f"  Relative Uncertainty ({model2_name}): {rel_uncertainty2:.2f}%\n")
             f.write("\n")
 
     def reset_file(self):
         """Clears the content of the output file."""
         with open(self.output_file, 'w') as f:
             f.write("")  # Write an empty string to clear the file.
+
+
+
 
 

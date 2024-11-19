@@ -86,7 +86,7 @@ class HReconstructionPlot:
         plt.figure(figsize=(8, 6))
 
         # Dados originais com barras de erro
-        plt.errorbar(self.z_values, self.H_obs, yerr=self.errors, fmt='o', capsize=4, color='k', label='Data')
+        plt.errorbar(self.z_values, self.H_obs, yerr=self.errors, fmt='o', capsize=4, color='r', label='Data', alpha=0.6)
 
         # Função predita pelo GP
         plt.plot(self.z_test, self.mean, 'k-', label='Reconstruction')
@@ -95,13 +95,13 @@ class HReconstructionPlot:
         plt.fill_between(self.z_test.flatten(), 
                          self.mean.flatten() - 1*np.sqrt(self.var.flatten()), 
                          self.mean.flatten() + 1*np.sqrt(self.var.flatten()), 
-                         alpha=0.3, color='k', label='1σ')
+                         alpha=0.3, color='green', label='1σ')
         plt.fill_between(self.z_test.flatten(), 
                          self.mean.flatten() - 2*np.sqrt(self.var.flatten()), 
                          self.mean.flatten() + 2*np.sqrt(self.var.flatten()), 
-                         alpha=0.2, color='gray', label='2σ')
+                         alpha=0.2, color='green', label='2σ')
 
-        plt.plot(self.z_test, self.H_theory, 'b--', label='$\\Lambda$CDM model')
+        #plt.plot(self.z_test, self.H_theory, 'b--', label='$\\Lambda$CDM model')
 
         plt.xlabel('Redshift ($z$)', fontsize=14)
         plt.ylabel('$H(z)$', fontsize=14)

@@ -4,7 +4,7 @@ from equations import FiducialModel
 # Defining a seed for reproducibility
 np.random.seed(42)
 
-# Defining a fiducial model
+# Defining a fiducial model 
 fiducial_model = FiducialModel()
 
 class RedshiftSimulation:

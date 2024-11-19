@@ -1,0 +1,243 @@
+Comparing FRB vs w-joint:
+----------------------------------------
+h:
+  % Difference in Central Value: 4.71%
+  Lower Error Reduction: -8.31%
+  Upper Error Reduction: -2.70%
+  Interpretation:
+    Lower: w-joint has higher uncertainty (worse performance).
+    Upper: w-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (FRB): 2.79%
+  Relative Uncertainty (w-joint): 0.33%
+Omega_mh2:
+  % Difference in Central Value: -6.94%
+  Lower Error Reduction: -0.96%
+  Upper Error Reduction: 9.88%
+  Interpretation:
+    Lower: w-joint has higher uncertainty (worse performance).
+    Upper: w-joint has lower uncertainty (improvement).
+  Relative Uncertainty (FRB): 19.58%
+  Relative Uncertainty (w-joint): 14.74%
+Omega_bh2:
+  % Difference in Central Value: 0.37%
+  Lower Error Reduction: -0.64%
+  Upper Error Reduction: -0.27%
+  Interpretation:
+    Lower: w-joint has higher uncertainty (worse performance).
+    Upper: w-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (FRB): 1.20%
+  Relative Uncertainty (w-joint): 1.07%
+DM_host_0:
+  % Difference in Central Value: 10.20%
+  Lower Error Reduction: -11.28%
+  Upper Error Reduction: -9.60%
+  Interpretation:
+    Lower: w-joint has higher uncertainty (worse performance).
+    Upper: w-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (FRB): 8.10%
+  Relative Uncertainty (w-joint): 7.16%
+omega_0:
+  % Difference in Central Value: -58.30%
+  Lower Error Reduction: 61.88%
+  Upper Error Reduction: 56.96%
+  Interpretation:
+    Lower: w-joint has lower uncertainty (improvement).
+    Upper: w-joint has lower uncertainty (improvement).
+  Relative Uncertainty (FRB): 13.75%
+  Relative Uncertainty (w-joint): 7.74%
+
+Comparing CC vs w-joint:
+----------------------------------------
+h:
+  % Difference in Central Value: 2.31%
+  Lower Error Reduction: -6.05%
+  Upper Error Reduction: 1.06%
+  Interpretation:
+    Lower: w-joint has higher uncertainty (worse performance).
+    Upper: w-joint has lower uncertainty (improvement).
+  Relative Uncertainty (CC): 3.24%
+  Relative Uncertainty (w-joint): 0.33%
+Omega_mh2:
+  % Difference in Central Value: -29.10%
+  Lower Error Reduction: 31.63%
+  Upper Error Reduction: 32.74%
+  Interpretation:
+    Lower: w-joint has lower uncertainty (improvement).
+    Upper: w-joint has lower uncertainty (improvement).
+  Relative Uncertainty (CC): 16.44%
+  Relative Uncertainty (w-joint): 14.74%
+omega_0:
+  % Difference in Central Value: -43.88%
+  Lower Error Reduction: 52.40%
+  Upper Error Reduction: 31.49%
+  Interpretation:
+    Lower: w-joint has lower uncertainty (improvement).
+    Upper: w-joint has lower uncertainty (improvement).
+  Relative Uncertainty (CC): 24.46%
+  Relative Uncertainty (w-joint): 7.74%
+
+Comparing SNe vs w-joint:
+----------------------------------------
+h:
+  % Difference in Central Value: 0.30%
+  Lower Error Reduction: -0.32%
+  Upper Error Reduction: -0.31%
+  Interpretation:
+    Lower: w-joint has higher uncertainty (worse performance).
+    Upper: w-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (SNe): 0.35%
+  Relative Uncertainty (w-joint): 0.33%
+Omega_mh2:
+  % Difference in Central Value: 7.62%
+  Lower Error Reduction: -43.46%
+  Upper Error Reduction: 7.78%
+  Interpretation:
+    Lower: w-joint has higher uncertainty (worse performance).
+    Upper: w-joint has lower uncertainty (improvement).
+  Relative Uncertainty (SNe): 32.66%
+  Relative Uncertainty (w-joint): 14.74%
+omega_0:
+  % Difference in Central Value: 6.95%
+  Lower Error Reduction: -2.30%
+  Upper Error Reduction: -15.51%
+  Interpretation:
+    Lower: w-joint has higher uncertainty (worse performance).
+    Upper: w-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (SNe): 13.22%
+  Relative Uncertainty (w-joint): 7.74%
+
+Comparing FRB vs CPL-joint:
+----------------------------------------
+h:
+  % Difference in Central Value: 3.90%
+  Lower Error Reduction: -7.54%
+  Upper Error Reduction: -1.76%
+  Interpretation:
+    Lower: CPL-joint has higher uncertainty (worse performance).
+    Upper: CPL-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (FRB): 2.91%
+  Relative Uncertainty (CPL-joint): 0.40%
+Omega_mh2:
+  % Difference in Central Value: 47.70%
+  Lower Error Reduction: -106.32%
+  Upper Error Reduction: -37.84%
+  Interpretation:
+    Lower: CPL-joint has higher uncertainty (worse performance).
+    Upper: CPL-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (FRB): 33.37%
+  Relative Uncertainty (CPL-joint): 18.88%
+Omega_bh2:
+  % Difference in Central Value: 0.44%
+  Lower Error Reduction: -0.74%
+  Upper Error Reduction: -0.32%
+  Interpretation:
+    Lower: CPL-joint has higher uncertainty (worse performance).
+    Upper: CPL-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (FRB): 1.23%
+  Relative Uncertainty (CPL-joint): 1.07%
+DM_host_0:
+  % Difference in Central Value: 10.88%
+  Lower Error Reduction: -12.54%
+  Upper Error Reduction: -9.95%
+  Interpretation:
+    Lower: CPL-joint has higher uncertainty (worse performance).
+    Upper: CPL-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (FRB): 8.17%
+  Relative Uncertainty (CPL-joint): 6.92%
+omega_0:
+  % Difference in Central Value: -61.02%
+  Lower Error Reduction: 64.00%
+  Upper Error Reduction: 59.66%
+  Interpretation:
+    Lower: CPL-joint has lower uncertainty (improvement).
+    Upper: CPL-joint has lower uncertainty (improvement).
+  Relative Uncertainty (FRB): 16.87%
+  Relative Uncertainty (CPL-joint): 11.21%
+omega_a:
+  % Difference in Central Value: 7970.82%
+  Lower Error Reduction: -39.28%
+  Upper Error Reduction: 52.64%
+  Interpretation:
+    Lower: CPL-joint has higher uncertainty (worse performance).
+    Upper: CPL-joint has lower uncertainty (improvement).
+  Relative Uncertainty (FRB): 7817.24%
+  Relative Uncertainty (CPL-joint): 49.59%
+
+Comparing CC vs CPL-joint:
+----------------------------------------
+h:
+  % Difference in Central Value: 1.61%
+  Lower Error Reduction: -5.04%
+  Upper Error Reduction: 1.67%
+  Interpretation:
+    Lower: CPL-joint has higher uncertainty (worse performance).
+    Upper: CPL-joint has lower uncertainty (improvement).
+  Relative Uncertainty (CC): 3.19%
+  Relative Uncertainty (CPL-joint): 0.40%
+Omega_mh2:
+  % Difference in Central Value: -6.77%
+  Lower Error Reduction: 5.95%
+  Upper Error Reduction: 9.46%
+  Interpretation:
+    Lower: CPL-joint has lower uncertainty (improvement).
+    Upper: CPL-joint has lower uncertainty (improvement).
+  Relative Uncertainty (CC): 20.79%
+  Relative Uncertainty (CPL-joint): 18.88%
+omega_0:
+  % Difference in Central Value: -50.59%
+  Lower Error Reduction: 55.50%
+  Upper Error Reduction: 43.18%
+  Interpretation:
+    Lower: CPL-joint has lower uncertainty (improvement).
+    Upper: CPL-joint has lower uncertainty (improvement).
+  Relative Uncertainty (CC): 22.50%
+  Relative Uncertainty (CPL-joint): 11.21%
+omega_a:
+  % Difference in Central Value: -1105.63%
+  Lower Error Reduction: -73.99%
+  Upper Error Reduction: 56.18%
+  Interpretation:
+    Lower: CPL-joint has higher uncertainty (worse performance).
+    Upper: CPL-joint has lower uncertainty (improvement).
+  Relative Uncertainty (CC): 957.68%
+  Relative Uncertainty (CPL-joint): 49.59%
+
+Comparing SNe vs CPL-joint:
+----------------------------------------
+h:
+  % Difference in Central Value: 0.12%
+  Lower Error Reduction: -0.17%
+  Upper Error Reduction: -0.09%
+  Interpretation:
+    Lower: CPL-joint has higher uncertainty (worse performance).
+    Upper: CPL-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (SNe): 0.42%
+  Relative Uncertainty (CPL-joint): 0.40%
+Omega_mh2:
+  % Difference in Central Value: -2.32%
+  Lower Error Reduction: -4.67%
+  Upper Error Reduction: 7.58%
+  Interpretation:
+    Lower: CPL-joint has higher uncertainty (worse performance).
+    Upper: CPL-joint has lower uncertainty (improvement).
+  Relative Uncertainty (SNe): 23.92%
+  Relative Uncertainty (CPL-joint): 18.88%
+omega_0:
+  % Difference in Central Value: -1.12%
+  Lower Error Reduction: 3.39%
+  Upper Error Reduction: -2.59%
+  Interpretation:
+    Lower: CPL-joint has lower uncertainty (improvement).
+    Upper: CPL-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (SNe): 13.93%
+  Relative Uncertainty (CPL-joint): 11.21%
+omega_a:
+  % Difference in Central Value: 16.91%
+  Lower Error Reduction: -7.56%
+  Upper Error Reduction: -69.43%
+  Interpretation:
+    Lower: CPL-joint has higher uncertainty (worse performance).
+    Upper: CPL-joint has higher uncertainty (worse performance).
+  Relative Uncertainty (SNe): 63.37%
+  Relative Uncertainty (CPL-joint): 49.59%
+

@@ -1,0 +1,30 @@
+Comparing GaPP vs Refann:
+----------------------------------------
+Omega_bh2:
+  % Difference in Central Value: 0.03%
+  Lower Error Reduction: -0.04%
+  Upper Error Reduction: -0.04%
+  Interpretation:
+    Lower: Refann has higher uncertainty (worse performance).
+    Upper: Refann has higher uncertainty (worse performance).
+  Relative Uncertainty (GaPP): 2.06%
+  Relative Uncertainty (Refann): 2.06%
+DM_host_0:
+  % Difference in Central Value: -0.68%
+  Lower Error Reduction: 1.08%
+  Upper Error Reduction: 0.57%
+  Interpretation:
+    Lower: Refann has lower uncertainty (improvement).
+    Upper: Refann has lower uncertainty (improvement).
+  Relative Uncertainty (GaPP): 7.70%
+  Relative Uncertainty (Refann): 7.80%
+H0:
+  % Difference in Central Value: 0.02%
+  Lower Error Reduction: -0.02%
+  Upper Error Reduction: -0.02%
+  Interpretation:
+    Lower: Refann has higher uncertainty (worse performance).
+    Upper: Refann has higher uncertainty (worse performance).
+  Relative Uncertainty (GaPP): 1.03%
+  Relative Uncertainty (Refann): 1.03%
+

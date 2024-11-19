@@ -1,0 +1,117 @@
+Comparing FRB vs Joint:
+----------------------------------------
+H0:
+  % Difference in Central Value: 5.20%
+  Lower Error Reduction: -35.14%
+  Upper Error Reduction: 10.47%
+  Interpretation:
+    Lower: Joint has higher uncertainty (worse performance).
+    Upper: Joint has lower uncertainty (improvement).
+  Relative Uncertainty (FRB): 18.69%
+  Relative Uncertainty (Joint): 0.34%
+Omega_bh2:
+  % Difference in Central Value: 0.19%
+  Lower Error Reduction: -0.20%
+  Upper Error Reduction: -0.24%
+  Interpretation:
+    Lower: Joint has higher uncertainty (worse performance).
+    Upper: Joint has higher uncertainty (worse performance).
+  Relative Uncertainty (FRB): 2.16%
+  Relative Uncertainty (Joint): 2.19%
+q0:
+  % Difference in Central Value: -29.31%
+  Lower Error Reduction: 38.96%
+  Upper Error Reduction: 7.38%
+  Interpretation:
+    Lower: Joint has lower uncertainty (improvement).
+    Upper: Joint has lower uncertainty (improvement).
+  Relative Uncertainty (FRB): 28.68%
+  Relative Uncertainty (Joint): 11.49%
+j0:
+  % Difference in Central Value: -67.21%
+  Lower Error Reduction: 76.70%
+  Upper Error Reduction: 68.05%
+  Interpretation:
+    Lower: Joint has lower uncertainty (improvement).
+    Upper: Joint has lower uncertainty (improvement).
+  Relative Uncertainty (FRB): 55.86%
+  Relative Uncertainty (Joint): 64.43%
+A:
+  % Difference in Central Value: 4.82%
+  Lower Error Reduction: -7.69%
+  Upper Error Reduction: -2.71%
+  Interpretation:
+    Lower: Joint has higher uncertainty (worse performance).
+    Upper: Joint has higher uncertainty (worse performance).
+  Relative Uncertainty (FRB): 11.39%
+  Relative Uncertainty (Joint): 9.40%
+beta:
+  % Difference in Central Value: 3.86%
+  Lower Error Reduction: -51.06%
+  Upper Error Reduction: 17.06%
+  Interpretation:
+    Lower: Joint has higher uncertainty (worse performance).
+    Upper: Joint has lower uncertainty (improvement).
+  Relative Uncertainty (FRB): 45.25%
+  Relative Uncertainty (Joint): 21.57%
+
+Comparing CC vs Joint:
+----------------------------------------
+H0:
+  % Difference in Central Value: 4.46%
+  Lower Error Reduction: -9.42%
+  Upper Error Reduction: 0.14%
+  Interpretation:
+    Lower: Joint has higher uncertainty (worse performance).
+    Upper: Joint has lower uncertainty (improvement).
+  Relative Uncertainty (CC): 4.78%
+  Relative Uncertainty (Joint): 0.34%
+q0:
+  % Difference in Central Value: -34.86%
+  Lower Error Reduction: 44.59%
+  Upper Error Reduction: 16.91%
+  Interpretation:
+    Lower: Joint has lower uncertainty (improvement).
+    Upper: Joint has lower uncertainty (improvement).
+  Relative Uncertainty (CC): 27.54%
+  Relative Uncertainty (Joint): 11.49%
+j0:
+  % Difference in Central Value: -69.80%
+  Lower Error Reduction: 84.01%
+  Upper Error Reduction: 68.36%
+  Interpretation:
+    Lower: Joint has lower uncertainty (improvement).
+    Upper: Joint has lower uncertainty (improvement).
+  Relative Uncertainty (CC): 46.95%
+  Relative Uncertainty (Joint): 64.43%
+
+Comparing SNe vs Joint:
+----------------------------------------
+H0:
+  % Difference in Central Value: 0.02%
+  Lower Error Reduction: -0.06%
+  Upper Error Reduction: 0.03%
+  Interpretation:
+    Lower: Joint has higher uncertainty (worse performance).
+    Upper: Joint has lower uncertainty (improvement).
+  Relative Uncertainty (SNe): 0.37%
+  Relative Uncertainty (Joint): 0.34%
+q0:
+  % Difference in Central Value: -4.88%
+  Lower Error Reduction: 7.75%
+  Upper Error Reduction: -0.47%
+  Interpretation:
+    Lower: Joint has lower uncertainty (improvement).
+    Upper: Joint has higher uncertainty (worse performance).
+  Relative Uncertainty (SNe): 15.26%
+  Relative Uncertainty (Joint): 11.49%
+j0:
+  % Difference in Central Value: -44.08%
+  Lower Error Reduction: 48.64%
+  Upper Error Reduction: 43.27%
+  Interpretation:
+    Lower: Joint has lower uncertainty (improvement).
+    Upper: Joint has lower uncertainty (improvement).
+  Relative Uncertainty (SNe): 62.04%
+  Relative Uncertainty (Joint): 64.43%
+
